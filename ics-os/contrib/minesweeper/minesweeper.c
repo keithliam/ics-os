@@ -308,7 +308,7 @@ int main(){
 			startGame();
 		}
 
-	}while(keypress == QUIT_KEY);
+	}while(keypress != QUIT_KEY);
 	// if(boardLength) freeBoard();
 	set_graphics(VGA_TEXT80X25X16);
 	return 0;
