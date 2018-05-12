@@ -89,6 +89,10 @@ void drawNum8(int i, int j);
 void drawFlag(int i, int j);
 void drawCell(int i, int j);
 void drawBoard();
+void drawStatusLogo();
+void drawStatusMines();
+void drawStatusBar();
+void drawGame();
 void startGame();
 
 /* Global Variables */
@@ -296,11 +300,31 @@ void drawBoard(){
 			drawCell(i, j);
 }
 
+void drawStatusLogo(){
+	write_text("MINESWEEPER", 10, offsetY, TEXT_COLOR, 0);
+}
+
+void drawStatusMines(){
+	char status[15];
+	sprintf(status, "%s%d", "MINES LEFT: ", minesLeft);
+	write_text(status, 187, offsetY, TEXT_COLOR, 0);
+}
+
+void drawStatusBar(){
+	drawStatusLogo();
+	drawStatusMines();
+}
+
+void drawGame(){
+	drawBoard();
+	drawStatusBar();
+}
+
 void startGame(){
 	initializeBoard();
 	// randomizeMines();
 	hiddenBoard[0][0] = HIDDEN_SELECTED;
-	drawBoard();
+	drawGame();
 }
 
 int main(){
@@ -312,6 +336,7 @@ int main(){
 		if(keypress == SPACE_KEY){
 			offsetX = LARGE_X_OFFSET;
 			offsetY = (200 - TEXT_SIZE - TEXT_BOARD_OFFSET - (LARGE * 7)) / 2;
+			minesLeft = LARGE_MINES;
 			boardLength = LARGE;
 			startGame();
 		}
