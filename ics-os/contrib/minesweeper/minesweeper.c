@@ -311,5 +311,6 @@ int main(){
 	}while(keypress != QUIT_KEY);
 	// if(boardLength) freeBoard();
 	set_graphics(VGA_TEXT80X25X16);
+	clrscr();
 	return 0;
 }
