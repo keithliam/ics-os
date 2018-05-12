@@ -95,8 +95,8 @@ int** hiddenBoard;	// lists hidden/unhidden/selected cells
 
 void drawBackground(){
 	int i, j;
-	for(i = 0; i < 200; i++)
-		for(j = 0; j < 320; j++)
+	for(i = 0; i < 320; i++)
+		for(j = 0; j < 200; j++)
 			write_pixel(i, j, BACKGROUND_COLOR);
 }
 
