@@ -103,13 +103,6 @@ int minesLeft;
 int** board;
 int** hiddenBoard;	// lists hidden/unhidden/selected cells
 
-void drawBackground(){
-	int i, j;
-	for(i = 0; i < 320; i++)
-		for(j = 0; j < 200; j++)
-			write_pixel(i, j, BACKGROUND_COLOR);
-}
-
 void initializeBoard(){
 	int i, j;
 	board = (int**) malloc(sizeof(int*) * boardLength);
@@ -122,6 +115,13 @@ void initializeBoard(){
 			hiddenBoard[i][j] = HIDDEN;
 		}
 	}
+}
+
+void drawBackground(){
+	int i, j;
+	for(j = 0; j < 200; j++)
+		for(i = 0; i < 320; i++)
+			write_pixel(i, j, BACKGROUND_COLOR);
 }
 
 void drawBox(int col, int row, int color){
