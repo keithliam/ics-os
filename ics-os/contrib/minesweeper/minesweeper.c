@@ -47,7 +47,7 @@
 /* Dimensions */
 #define CELL_SIZE 7
 #define TEXT_SIZE 7
-#define TEXT_BOARD_OFFSET 2
+#define TEXT_BOARD_OFFSET 5
 #define SMALL_X_OFFSET 76
 #define MEDIUM_X_OFFSET 76
 #define LARGE_X_OFFSET 76
