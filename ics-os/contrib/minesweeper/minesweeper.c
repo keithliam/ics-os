@@ -46,6 +46,11 @@
 
 /* Dimensions */
 #define CELL_SIZE 7
+#define TEXT_SIZE 7
+#define TEXT_BOARD_OFFSET 2
+#define SMALL_X_OFFSET 76
+#define MEDIUM_X_OFFSET 76
+#define LARGE_X_OFFSET 76
 
 /* Board Sizes */
 #define SMALL 8
@@ -89,6 +94,7 @@ void startGame();
 /* Global Variables */
 int boardLength = 0;
 int selectedX = 0, selectedY = 0;
+int offsetX = 0, offsetY = 0;
 int minesLeft;
 int** board;
 int** hiddenBoard;	// lists hidden/unhidden/selected cells
@@ -114,29 +120,27 @@ void initializeBoard(){
 	}
 }
 
-void drawBox(int row, int col, int color){
+void drawBox(int col, int row, int color){
 	int i, j;
-	col = col * CELL_SIZE;
-	row = row * CELL_SIZE;
 	for(i = 0; i < CELL_SIZE; i++)
 		for(j = 0; j < CELL_SIZE; j++)
 			write_pixel(col + j, row + i, color);
 }
 
 void drawMine(int i, int j){
-	write_pixel(j + 3, i + 1, MINE_COLOR);
-	write_pixel(j + 2, i + 2, MINE_COLOR);
-	write_pixel(j + 3, i + 2, MINE_COLOR);
-	write_pixel(j + 4, i + 2, MINE_COLOR);
-	write_pixel(j + 1, i + 3, MINE_COLOR);
-	write_pixel(j + 2, i + 3, MINE_COLOR);
-	write_pixel(j + 3, i + 3, MINE_CENTER_COLOR);
-	write_pixel(j + 4, i + 3, MINE_COLOR);
-	write_pixel(j + 5, i + 3, MINE_COLOR);
-	write_pixel(j + 2, i + 4, MINE_COLOR);
-	write_pixel(j + 3, i + 4, MINE_COLOR);
-	write_pixel(j + 4, i + 4, MINE_COLOR);
-	write_pixel(j + 3, i + 5, MINE_COLOR);
+	write_pixel(i + 3, j + 1, MINE_COLOR);
+	write_pixel(i + 2, j + 2, MINE_COLOR);
+	write_pixel(i + 3, j + 2, MINE_COLOR);
+	write_pixel(i + 4, j + 2, MINE_COLOR);
+	write_pixel(i + 1, j + 3, MINE_COLOR);
+	write_pixel(i + 2, j + 3, MINE_COLOR);
+	write_pixel(i + 3, j + 3, MINE_CENTER_COLOR);
+	write_pixel(i + 4, j + 3, MINE_COLOR);
+	write_pixel(i + 5, j + 3, MINE_COLOR);
+	write_pixel(i + 2, j + 4, MINE_COLOR);
+	write_pixel(i + 3, j + 4, MINE_COLOR);
+	write_pixel(i + 4, j + 4, MINE_COLOR);
+	write_pixel(i + 3, j + 5, MINE_COLOR);
 }
 
 void drawMineSelected(int i, int j){
@@ -145,142 +149,144 @@ void drawMineSelected(int i, int j){
 }
 
 void drawNum1(int i, int j){
-	write_pixel(j + 2, i + 1, NUM_1_COLOR);
-	write_pixel(j + 3, i + 1, NUM_1_COLOR);
-	write_pixel(j + 3, i + 2, NUM_1_COLOR);
-	write_pixel(j + 3, i + 3, NUM_1_COLOR);
-	write_pixel(j + 3, i + 4, NUM_1_COLOR);
-	write_pixel(j + 2, i + 5, NUM_1_COLOR);
-	write_pixel(j + 3, i + 5, NUM_1_COLOR);
-	write_pixel(j + 4, i + 5, NUM_1_COLOR);
+	write_pixel(i + 2, j + 1, NUM_1_COLOR);
+	write_pixel(i + 3, j + 1, NUM_1_COLOR);
+	write_pixel(i + 3, j + 2, NUM_1_COLOR);
+	write_pixel(i + 3, j + 3, NUM_1_COLOR);
+	write_pixel(i + 3, j + 4, NUM_1_COLOR);
+	write_pixel(i + 2, j + 5, NUM_1_COLOR);
+	write_pixel(i + 3, j + 5, NUM_1_COLOR);
+	write_pixel(i + 4, j + 5, NUM_1_COLOR);
 }
 
 void drawNum2(int i, int j){
-	write_pixel(j + 2, i + 1, NUM_2_COLOR);
-	write_pixel(j + 3, i + 1, NUM_2_COLOR);
-	write_pixel(j + 4, i + 1, NUM_2_COLOR);
-	write_pixel(j + 4, i + 2, NUM_2_COLOR);
-	write_pixel(j + 4, i + 3, NUM_2_COLOR);
-	write_pixel(j + 3, i + 3, NUM_2_COLOR);
-	write_pixel(j + 2, i + 3, NUM_2_COLOR);
-	write_pixel(j + 2, i + 4, NUM_2_COLOR);
-	write_pixel(j + 2, i + 5, NUM_2_COLOR);
-	write_pixel(j + 3, i + 5, NUM_2_COLOR);
-	write_pixel(j + 4, i + 5, NUM_2_COLOR);
+	write_pixel(i + 2, j + 1, NUM_2_COLOR);
+	write_pixel(i + 3, j + 1, NUM_2_COLOR);
+	write_pixel(i + 4, j + 1, NUM_2_COLOR);
+	write_pixel(i + 4, j + 2, NUM_2_COLOR);
+	write_pixel(i + 4, j + 3, NUM_2_COLOR);
+	write_pixel(i + 3, j + 3, NUM_2_COLOR);
+	write_pixel(i + 2, j + 3, NUM_2_COLOR);
+	write_pixel(i + 2, j + 4, NUM_2_COLOR);
+	write_pixel(i + 2, j + 5, NUM_2_COLOR);
+	write_pixel(i + 3, j + 5, NUM_2_COLOR);
+	write_pixel(i + 4, j + 5, NUM_2_COLOR);
 }
 
 void drawNum3(int i, int j){
-	write_pixel(j + 2, i + 1, NUM_3_COLOR);
-	write_pixel(j + 3, i + 1, NUM_3_COLOR);
-	write_pixel(j + 4, i + 1, NUM_3_COLOR);
-	write_pixel(j + 4, i + 2, NUM_3_COLOR);
-	write_pixel(j + 2, i + 3, NUM_3_COLOR);
-	write_pixel(j + 3, i + 3, NUM_3_COLOR);
-	write_pixel(j + 4, i + 3, NUM_3_COLOR);
-	write_pixel(j + 4, i + 4, NUM_3_COLOR);
-	write_pixel(j + 2, i + 4, NUM_3_COLOR);
-	write_pixel(j + 3, i + 4, NUM_3_COLOR);
-	write_pixel(j + 4, i + 4, NUM_3_COLOR);
+	write_pixel(i + 2, j + 1, NUM_3_COLOR);
+	write_pixel(i + 3, j + 1, NUM_3_COLOR);
+	write_pixel(i + 4, j + 1, NUM_3_COLOR);
+	write_pixel(i + 4, j + 2, NUM_3_COLOR);
+	write_pixel(i + 2, j + 3, NUM_3_COLOR);
+	write_pixel(i + 3, j + 3, NUM_3_COLOR);
+	write_pixel(i + 4, j + 3, NUM_3_COLOR);
+	write_pixel(i + 4, j + 4, NUM_3_COLOR);
+	write_pixel(i + 2, j + 4, NUM_3_COLOR);
+	write_pixel(i + 3, j + 4, NUM_3_COLOR);
+	write_pixel(i + 4, j + 4, NUM_3_COLOR);
 }
 
 void drawNum4(int i, int j){
-	write_pixel(j + 2, i + 1, NUM_4_COLOR);
-	write_pixel(j + 4, i + 1, NUM_4_COLOR);
-	write_pixel(j + 2, i + 2, NUM_4_COLOR);
-	write_pixel(j + 4, i + 2, NUM_4_COLOR);
-	write_pixel(j + 2, i + 3, NUM_4_COLOR);
-	write_pixel(j + 3, i + 3, NUM_4_COLOR);
-	write_pixel(j + 4, i + 3, NUM_4_COLOR);
-	write_pixel(j + 4, i + 4, NUM_4_COLOR);
-	write_pixel(j + 4, i + 5, NUM_4_COLOR);
+	write_pixel(i + 2, j + 1, NUM_4_COLOR);
+	write_pixel(i + 4, j + 1, NUM_4_COLOR);
+	write_pixel(i + 2, j + 2, NUM_4_COLOR);
+	write_pixel(i + 4, j + 2, NUM_4_COLOR);
+	write_pixel(i + 2, j + 3, NUM_4_COLOR);
+	write_pixel(i + 3, j + 3, NUM_4_COLOR);
+	write_pixel(i + 4, j + 3, NUM_4_COLOR);
+	write_pixel(i + 4, j + 4, NUM_4_COLOR);
+	write_pixel(i + 4, j + 5, NUM_4_COLOR);
 }
 
 void drawNum5(int i, int j){
-	write_pixel(j + 2, i + 1, NUM_5_COLOR);
-	write_pixel(j + 3, i + 1, NUM_5_COLOR);
-	write_pixel(j + 4, i + 1, NUM_5_COLOR);
-	write_pixel(j + 2, i + 2, NUM_5_COLOR);
-	write_pixel(j + 2, i + 3, NUM_5_COLOR);
-	write_pixel(j + 3, i + 3, NUM_5_COLOR);
-	write_pixel(j + 4, i + 3, NUM_5_COLOR);
-	write_pixel(j + 4, i + 4, NUM_5_COLOR);
-	write_pixel(j + 2, i + 5, NUM_5_COLOR);
-	write_pixel(j + 3, i + 5, NUM_5_COLOR);
-	write_pixel(j + 4, i + 5, NUM_5_COLOR);
+	write_pixel(i + 2, j + 1, NUM_5_COLOR);
+	write_pixel(i + 3, j + 1, NUM_5_COLOR);
+	write_pixel(i + 4, j + 1, NUM_5_COLOR);
+	write_pixel(i + 2, j + 2, NUM_5_COLOR);
+	write_pixel(i + 2, j + 3, NUM_5_COLOR);
+	write_pixel(i + 3, j + 3, NUM_5_COLOR);
+	write_pixel(i + 4, j + 3, NUM_5_COLOR);
+	write_pixel(i + 4, j + 4, NUM_5_COLOR);
+	write_pixel(i + 2, j + 5, NUM_5_COLOR);
+	write_pixel(i + 3, j + 5, NUM_5_COLOR);
+	write_pixel(i + 4, j + 5, NUM_5_COLOR);
 }
 
 void drawNum6(int i, int j){
-	write_pixel(j + 2, i + 1, NUM_6_COLOR);
-	write_pixel(j + 3, i + 1, NUM_6_COLOR);
-	write_pixel(j + 4, i + 1, NUM_6_COLOR);
-	write_pixel(j + 2, i + 2, NUM_6_COLOR);
-	write_pixel(j + 2, i + 3, NUM_6_COLOR);
-	write_pixel(j + 3, i + 3, NUM_6_COLOR);
-	write_pixel(j + 4, i + 3, NUM_6_COLOR);
-	write_pixel(j + 2, i + 4, NUM_6_COLOR);
-	write_pixel(j + 4, i + 4, NUM_6_COLOR);
-	write_pixel(j + 2, i + 5, NUM_6_COLOR);
-	write_pixel(j + 3, i + 5, NUM_6_COLOR);
-	write_pixel(j + 4, i + 5, NUM_6_COLOR);
+	write_pixel(i + 2, j + 1, NUM_6_COLOR);
+	write_pixel(i + 3, j + 1, NUM_6_COLOR);
+	write_pixel(i + 4, j + 1, NUM_6_COLOR);
+	write_pixel(i + 2, j + 2, NUM_6_COLOR);
+	write_pixel(i + 2, j + 3, NUM_6_COLOR);
+	write_pixel(i + 3, j + 3, NUM_6_COLOR);
+	write_pixel(i + 4, j + 3, NUM_6_COLOR);
+	write_pixel(i + 2, j + 4, NUM_6_COLOR);
+	write_pixel(i + 4, j + 4, NUM_6_COLOR);
+	write_pixel(i + 2, j + 5, NUM_6_COLOR);
+	write_pixel(i + 3, j + 5, NUM_6_COLOR);
+	write_pixel(i + 4, j + 5, NUM_6_COLOR);
 }
 
 void drawNum7(int i, int j){
-	write_pixel(j + 2, i + 1, NUM_7_COLOR);
-	write_pixel(j + 3, i + 1, NUM_7_COLOR);
-	write_pixel(j + 4, i + 1, NUM_7_COLOR);
-	write_pixel(j + 4, i + 2, NUM_7_COLOR);
-	write_pixel(j + 3, i + 3, NUM_7_COLOR);
-	write_pixel(j + 3, i + 4, NUM_7_COLOR);
-	write_pixel(j + 3, i + 5, NUM_7_COLOR);
+	write_pixel(i + 2, j + 1, NUM_7_COLOR);
+	write_pixel(i + 3, j + 1, NUM_7_COLOR);
+	write_pixel(i + 4, j + 1, NUM_7_COLOR);
+	write_pixel(i + 4, j + 2, NUM_7_COLOR);
+	write_pixel(i + 3, j + 3, NUM_7_COLOR);
+	write_pixel(i + 3, j + 4, NUM_7_COLOR);
+	write_pixel(i + 3, j + 5, NUM_7_COLOR);
 }
 
 void drawNum8(int i, int j){
-	write_pixel(j + 2, i + 1, NUM_8_COLOR);
-	write_pixel(j + 3, i + 1, NUM_8_COLOR);
-	write_pixel(j + 4, i + 1, NUM_8_COLOR);
-	write_pixel(j + 2, i + 2, NUM_8_COLOR);
-	write_pixel(j + 4, i + 2, NUM_8_COLOR);
-	write_pixel(j + 2, i + 3, NUM_8_COLOR);
-	write_pixel(j + 3, i + 3, NUM_8_COLOR);
-	write_pixel(j + 4, i + 3, NUM_8_COLOR);
-	write_pixel(j + 2, i + 4, NUM_8_COLOR);
-	write_pixel(j + 4, i + 4, NUM_8_COLOR);
-	write_pixel(j + 2, i + 5, NUM_8_COLOR);
-	write_pixel(j + 3, i + 5, NUM_8_COLOR);
-	write_pixel(j + 4, i + 5, NUM_8_COLOR);
+	write_pixel(i + 2, j + 1, NUM_8_COLOR);
+	write_pixel(i + 3, j + 1, NUM_8_COLOR);
+	write_pixel(i + 4, j + 1, NUM_8_COLOR);
+	write_pixel(i + 2, j + 2, NUM_8_COLOR);
+	write_pixel(i + 4, j + 2, NUM_8_COLOR);
+	write_pixel(i + 2, j + 3, NUM_8_COLOR);
+	write_pixel(i + 3, j + 3, NUM_8_COLOR);
+	write_pixel(i + 4, j + 3, NUM_8_COLOR);
+	write_pixel(i + 2, j + 4, NUM_8_COLOR);
+	write_pixel(i + 4, j + 4, NUM_8_COLOR);
+	write_pixel(i + 2, j + 5, NUM_8_COLOR);
+	write_pixel(i + 3, j + 5, NUM_8_COLOR);
+	write_pixel(i + 4, j + 5, NUM_8_COLOR);
 }
 
 void drawFlag(int i, int j){
-	write_pixel(j + 1, i + 1, FLAG_COLOR);
-	write_pixel(j + 2, i + 1, FLAG_COLOR);
-	write_pixel(j + 3, i + 1, FLAG_COLOR);
-	write_pixel(j + 1, i + 2, FLAG_COLOR);
-	write_pixel(j + 2, i + 2, FLAG_COLOR);
-	write_pixel(j + 3, i + 2, FLAG_COLOR);
-	write_pixel(j + 1, i + 3, FLAG_COLOR);
-	write_pixel(j + 2, i + 3, FLAG_COLOR);
-	write_pixel(j + 3, i + 3, FLAG_COLOR);
-	write_pixel(j + 4, i + 1, FLAGSTICK_COLOR);
-	write_pixel(j + 4, i + 2, FLAGSTICK_COLOR);
-	write_pixel(j + 4, i + 3, FLAGSTICK_COLOR);
-	write_pixel(j + 4, i + 4, FLAGSTICK_COLOR);
-	write_pixel(j + 4, i + 5, FLAGSTICK_COLOR);
+	write_pixel(i + 1, j + 1, FLAG_COLOR);
+	write_pixel(i + 2, j + 1, FLAG_COLOR);
+	write_pixel(i + 3, j + 1, FLAG_COLOR);
+	write_pixel(i + 1, j + 2, FLAG_COLOR);
+	write_pixel(i + 2, j + 2, FLAG_COLOR);
+	write_pixel(i + 3, j + 2, FLAG_COLOR);
+	write_pixel(i + 1, j + 3, FLAG_COLOR);
+	write_pixel(i + 2, j + 3, FLAG_COLOR);
+	write_pixel(i + 3, j + 3, FLAG_COLOR);
+	write_pixel(i + 4, j + 1, FLAGSTICK_COLOR);
+	write_pixel(i + 4, j + 2, FLAGSTICK_COLOR);
+	write_pixel(i + 4, j + 3, FLAGSTICK_COLOR);
+	write_pixel(i + 4, j + 4, FLAGSTICK_COLOR);
+	write_pixel(i + 4, j + 5, FLAGSTICK_COLOR);
 }
 
 void drawCell(int i, int j){
-	if(hiddenBoard[i][j] == HIDDEN_SELECTED || hiddenBoard[i][j] == REVEALED_SELECTED) drawBox(i, j, SELECTED_COLOR);
-	else if(hiddenBoard[i][j] == REVEALED_SELECTED && board[i][j] == MINE) drawMineSelected(i, j);
-	if(hiddenBoard[i][j] == HIDDEN) drawBox(i, j, CELL_COLOR);
-	else if(board[i][j] == NUM_1) drawNum1(i, j);
-	else if(board[i][j] == NUM_2) drawNum2(i, j);
-	else if(board[i][j] == NUM_3) drawNum3(i, j);
-	else if(board[i][j] == NUM_4) drawNum4(i, j);
-	else if(board[i][j] == NUM_5) drawNum5(i, j);
-	else if(board[i][j] == NUM_6) drawNum6(i, j);
-	else if(board[i][j] == NUM_7) drawNum7(i, j);
-	else if(board[i][j] == NUM_8) drawNum8(i, j);
-	else if(board[i][j] == MINE) drawMine(i, j);
-	if(board[i][j] == FLAGGED) drawFlag(i, j);
+	int col = (j * CELL_SIZE) + offsetX;
+	int row = (i * CELL_SIZE) + offsetY + TEXT_SIZE + TEXT_BOARD_OFFSET;
+	if(hiddenBoard[i][j] == HIDDEN_SELECTED || hiddenBoard[i][j] == REVEALED_SELECTED) drawBox(col, row, SELECTED_COLOR);
+	else if(hiddenBoard[i][j] == REVEALED_SELECTED && board[i][j] == MINE) drawMineSelected(col, row);
+	if(hiddenBoard[i][j] == HIDDEN) drawBox(col, row, CELL_COLOR);
+	else if(board[i][j] == NUM_1) drawNum1(col, row);
+	else if(board[i][j] == NUM_2) drawNum2(col, row);
+	else if(board[i][j] == NUM_3) drawNum3(col, row);
+	else if(board[i][j] == NUM_4) drawNum4(col, row);
+	else if(board[i][j] == NUM_5) drawNum5(col, row);
+	else if(board[i][j] == NUM_6) drawNum6(col, row);
+	else if(board[i][j] == NUM_7) drawNum7(col, row);
+	else if(board[i][j] == NUM_8) drawNum8(col, row);
+	else if(board[i][j] == MINE) drawMine(col, row);
+	if(board[i][j] == FLAGGED) drawFlag(col, row);
 }
 
 void drawBoard(){
@@ -304,6 +310,8 @@ int main(){
 	do {
 		keypress = (char) getch();
 		if(keypress == SPACE_KEY){
+			offsetX = LARGE_X_OFFSET;
+			offsetY = (200 - TEXT_SIZE - TEXT_BOARD_OFFSET - (LARGE * 7)) / 2;
 			boardLength = LARGE;
 			startGame();
 		}
