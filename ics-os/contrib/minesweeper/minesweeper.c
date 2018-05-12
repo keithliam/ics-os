@@ -93,6 +93,8 @@ void drawStatusLogo();
 void drawStatusMines();
 void drawStatusBar();
 void drawGame();
+void freeBoard();
+void openGameMenu();
 void startGame();
 
 /* Global Variables */
@@ -325,12 +327,19 @@ void startGame(){
 	// randomizeMines();
 	hiddenBoard[0][0] = HIDDEN_SELECTED;
 	drawGame();
+
+	// start here
 }
 
-int main(){
+void freeBoard(){
+	int i;
+	for(i = 0; i < boardLength; i++)
+		free(board[i]);
+	free(board);
+}
+
+void openGameMenu(){
 	char keypress;
-	set_graphics(VGA_320X200X256);
-	drawBackground();
 	do {
 		keypress = (char) getch();
 		if(keypress == SPACE_KEY){
@@ -340,9 +349,14 @@ int main(){
 			boardLength = LARGE;
 			startGame();
 		}
-
 	}while(keypress != QUIT_KEY);
-	// if(boardLength) freeBoard();
+	if(boardLength) freeBoard();
+}
+
+int main(){
+	set_graphics(VGA_320X200X256);
+	drawBackground();
+	openGameMenu();
 	set_graphics(VGA_TEXT80X25X16);
 	clrscr();
 	return 0;
