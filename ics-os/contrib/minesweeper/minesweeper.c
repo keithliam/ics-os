@@ -583,7 +583,7 @@ void randomizeMines(){
 	while(mines > 0){
 		x = rand() % boardLength;
 		y = rand() % boardLength;
-		if(board[y][x] || (x = selectedX && y = selectedY)) continue;
+		if(board[y][x] || (x = selectedX && y == selectedY)) continue;
 		board[y][x] = MINE;
 		mines--;
 	}
