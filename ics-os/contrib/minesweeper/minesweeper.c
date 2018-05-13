@@ -366,7 +366,7 @@ void getBoardSize(){
 		keypress = (char) getch();
 		if(keypress == SMALL_KEY){
 			boardLength = SMALL;
-			minesLeft = MEDIUM_MINES;
+			minesLeft = SMALL_MINES;
 		} else if(keypress == MEDIUM_KEY){
 			boardLength = MEDIUM;
 			minesLeft = MEDIUM_MINES;
