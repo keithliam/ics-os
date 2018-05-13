@@ -37,12 +37,13 @@
 #define NUM_6 6
 #define NUM_7 7
 #define NUM_8 8
-#define FLAGGED 9
 #define MINE 10
 #define HIDDEN 0
 #define REVEALED 1
 #define HIDDEN_SELECTED 10
 #define REVEALED_SELECTED 11
+#define HIDDEN_FLAGGED 20
+#define HIDDEN_FLAGGED_SELECTED 21
 
 /* Dimensions */
 #define CELL_SIZE 7
@@ -333,6 +334,8 @@ void drawCell(int i, int j){
 		drawBox(col, row, CELL_SIZE, CELL_SIZE, EMPTY_COLOR);
 	if(hiddenBoard[i][j] == HIDDEN_SELECTED) drawBox(col, row, CELL_SIZE, CELL_SIZE, SELECTED_COLOR);
 	else if(hiddenBoard[i][j] == HIDDEN) drawBox(col, row, CELL_SIZE, CELL_SIZE, CELL_COLOR);
+	else if(hiddenBoard[i][j] == HIDDEN_FLAGGED) drawBox(col, row, CELL_SIZE, CELL_SIZE, CELL_COLOR);
+	else if(hiddenBoard[i][j] == HIDDEN_FLAGGED_SELECTED) drawBox(col, row, CELL_SIZE, CELL_SIZE, SELECTED_COLOR);
 	else if(board[i][j] == NUM_1) drawNum1(col, row);
 	else if(board[i][j] == NUM_2) drawNum2(col, row);
 	else if(board[i][j] == NUM_3) drawNum3(col, row);
@@ -342,7 +345,8 @@ void drawCell(int i, int j){
 	else if(board[i][j] == NUM_7) drawNum7(col, row);
 	else if(board[i][j] == NUM_8) drawNum8(col, row);
 	else if(board[i][j] == MINE) drawMine(col, row);
-	if(board[i][j] == FLAGGED) drawFlag(col, row);
+	if(hiddenBoard[i][j] == HIDDEN_FLAGGED || hiddenBoard[i][j] == HIDDEN_FLAGGED_SELECTED)
+		drawFlag(col, row);
 }
 
 void drawBoard(){
@@ -455,9 +459,9 @@ void revealAllCells(){
 	int i, j;
 	for(i = 0; i < boardLength; i++){
 		for(j = 0; j < boardLength; j++){
-			if(hiddenBoard[i][j] == HIDDEN)
+			if(hiddenBoard[i][j] == HIDDEN || hiddenBoard[i][j] == HIDDEN_FLAGGED)
 				hiddenBoard[i][j] = REVEALED;
-			else if(hiddenBoard[i][j] == HIDDEN_SELECTED)
+			else if(hiddenBoard[i][j] == HIDDEN_SELECTED || hiddenBoard[i][j] == HIDDEN_FLAGGED_SELECTED)
 				hiddenBoard[i][j] = REVEALED_SELECTED;
 		}
 	}
@@ -493,7 +497,9 @@ void randomizeBoard(){
 void startGame(){
 	getBoardSize();
 	initializeBoard();
-	randomizeBoard();
+	randomizeBoard();	// move to after first click selection
+	hiddenBoard[7][7] = HIDDEN_FLAGGED;
+	hiddenBoard[0][0] = HIDDEN_FLAGGED_SELECTED;
 	startMinesweeper();
 		revealAllCells(); // remove
 		char keypress = (char) getch();	// remove
