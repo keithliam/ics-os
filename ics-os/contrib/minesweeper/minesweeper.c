@@ -105,9 +105,9 @@
 #define PRESS_ANY_KEY "(Press any key to continue)"
 
 /* Prototypes */
-void drawBackground();
 void initializeBoard();
-void drawBox(int row, int col, int color);
+void drawBackground();
+void drawBox(int col, int row, int color);
 void drawMine(int i, int j);
 void drawMineSelected(int i, int j);
 void drawNum1(int i, int j);
@@ -125,9 +125,19 @@ void drawStatusLogo();
 void drawStatusMines();
 void drawStatusBar();
 void drawGame();
-void freeBoard();
-void openGameMenu();
+void printBoardSizes();
+void getBoardSize();
+void startMinesweeper();
+void resetVariables();
+void randomizeMines();
 void startGame();
+void freeBoard();
+void printMainMenu();
+void printControlsMenu();
+void openControlsMenu();
+void printAboutMenu();
+void openAboutMenu();
+void openMainMenu();
 
 /* Global Variables */
 int boardLength = 0;
