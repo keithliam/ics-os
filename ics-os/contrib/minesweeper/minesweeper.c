@@ -95,6 +95,13 @@
 #define CONTROLS_FLAG "Flag       - F"
 #define CONTROLS_RESTART "Restart    - R"
 #define CONTROLS_QUIT_GAME "Quit Game  - Q"
+#define ABOUT_HEADER "ABOUT"
+#define ABOUT_PROJECT_INFO_1 "CMSC 125 T-6L"
+#define ABOUT_PROJECT_INFO_2 "13 May 2018"
+#define ABOUT_UI "Game UI:"
+#define ABOUT_UI_TEXT "Keith Liam Manaloto"
+#define ABOUT_IMPLEMENTATION "Implementation:"
+#define ABOUT_IMPLEMENTATION_TEXT "Juan Miguel Galvez"
 #define PRESS_ANY_KEY "(Press any key to continue)"
 
 /* Prototypes */
@@ -382,9 +389,10 @@ void getBoardSize(){
 
 void startMinesweeper(){
 	char keypress;
-	// do{
+	do{
+		drawGame();
 		keypress = (char) getch();
-	// }while(keypress)
+	}while(keypress != QUIT_KEY);
 }
 
 void resetVariables(){
@@ -403,7 +411,6 @@ void startGame(){
 	getBoardSize();
 	initializeBoard();
 	randomizeMines();
-	drawGame();	// remove
 	startMinesweeper();
 	resetVariables();
 }
@@ -447,7 +454,23 @@ void openControlsMenu(){
 	keypress = (char) getch();
 }
 
-void openAboutMenu(){}
+void printAboutMenu(){
+	drawBackground();
+	write_text(ABOUT_HEADER, 138, 30, TEXT_COLOR, 1);
+	write_text(ABOUT_PROJECT_INFO_1, 102, 62, TEXT_COLOR), 0;
+	write_text(ABOUT_PROJECT_INFO_2, 111, 72, TEXT_COLOR, 0);
+	write_text(ABOUT_UI, 124, 90, TEXT_COLOR, 0);
+	write_text(ABOUT_UI_TEXT, 75, 105, TEXT_COLOR, 0);
+	write_text(ABOUT_IMPLEMENTATION, 93, 125, TEXT_COLOR, 0);
+	write_text(ABOUT_IMPLEMENTATION_TEXT, 79, 138, TEXT_COLOR, 0);
+	write_text(PRESS_ANY_KEY, 43, 160, TEXT_COLOR, 0);
+}
+
+void openAboutMenu(){
+	char keypress;
+	printAboutMenu();
+	keypress = (char) getch();
+}
 
 void openMainMenu(){
 	char keypress;
