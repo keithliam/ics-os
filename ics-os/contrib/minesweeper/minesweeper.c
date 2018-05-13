@@ -53,9 +53,9 @@
 #define LARGE 24
 
 /* Number of Mines */
-#define SMALL_MINES 10;
-#define MEDIUM_MINES 40;
-#define LARGE_MINES 99;
+#define SMALL_MINES 10
+#define MEDIUM_MINES 40
+#define LARGE_MINES 99
 
 /* Controls */
 #define UP_KEY 'w'
@@ -131,6 +131,7 @@ void updateGame();
 void updateSelection(int x, int y, int newX, int newY);
 void moveSelection(int direction);
 void select();
+void updateMinesLeft();
 void flag();
 void restart();
 void startMinesweeper();
@@ -155,6 +156,7 @@ int selectedX = 0, selectedY = 0;
 int offsetX = 0, offsetY = 0;
 int textBoardOffset = 0;
 int minesLeft;
+int flagCount = 0;
 int** board;
 int** hiddenBoard;	// lists hidden/unhidden/selected cells
 
@@ -452,15 +454,34 @@ void select(int* selectNum){
 	}
 }
 
+void updateMinesLeft(){
+	if(boardLength == SMALL){
+		minesLeft = SMALL_MINES - flagCount;
+	} else if(boardLength == MEDIUM){
+		minesLeft = MEDIUM_MINES - flagCount;
+	} else if(boardLength == LARGE){
+		minesLeft = LARGE_MINES - flagCount;
+	}
+	if(minesLeft < 0) minesLeft = 0;
+	updateStatusMinesNum();
+}
+
 void flag(){
-	if(hiddenBoard[selectedY][selectedX] == HIDDEN) hiddenBoard[selectedY][selectedX] = HIDDEN_FLAGGED;
-	else if(hiddenBoard[selectedY][selectedX] == HIDDEN_FLAGGED) hiddenBoard[selectedY][selectedX] = HIDDEN;
+	if(hiddenBoard[selectedY][selectedX] == HIDDEN){
+		hiddenBoard[selectedY][selectedX] = HIDDEN_FLAGGED;
+		flagCount++;
+	} else if(hiddenBoard[selectedY][selectedX] == HIDDEN_FLAGGED){
+		hiddenBoard[selectedY][selectedX] = HIDDEN;
+		flagCount--;
+	}
+	updateMinesLeft();
 	drawCell(selectedY, selectedX);
 }
 
 void restart(){
 	selectedX = 0;
 	selectedY = 0;
+	flagCount = 0;
 	if(boardLength == SMALL){
 		minesLeft = SMALL_MINES;
 	} else if(boardLength == MEDIUM){
@@ -498,6 +519,7 @@ void resetVariables(){
 	minesLeft = 0;
 	offsetX = 0;
 	offsetY = 0;
+	flagCount = 0;
 	textBoardOffset = 0;
 }
 
