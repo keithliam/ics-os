@@ -552,8 +552,6 @@ int select(int* selectNum){
 			return LOSE;
 		} else {
 			revealCells(selectedX, selectedY);
-			minesLeft = hiddenCount;
-			updateStatusMinesNum();
 		}
 	} else if(isNum(selectedX, selectedY)){
 		selectAllAdjacent();
