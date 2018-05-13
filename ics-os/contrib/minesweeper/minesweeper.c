@@ -47,7 +47,7 @@
 /* Dimensions */
 #define CELL_SIZE 7
 #define TEXT_SIZE 7
-#define TEXT_BOARD_OFFSET 5
+#define TEXT_LARGE_BOARD_OFFSET 5
 #define SMALL_X_OFFSET 76
 #define MEDIUM_X_OFFSET 76
 #define LARGE_X_OFFSET 76
@@ -71,6 +71,34 @@
 #define FLAG_KEY 'f'
 #define RESET_KEY 'r'
 #define QUIT_KEY 'q'
+#define START_MENU_KEY '1'
+#define CONTROLS_MENU_KEY '2'
+#define ABOUT_MENU_KEY '3'
+#define EXIT_MENU_KEY '4'
+#define SMALL_KEY '1'
+#define MEDIUM_KEY '2'
+#define LARGE_KEY '3'
+
+/* Texts */
+#define LOGO_MENU_TEXT "MINESWEEPER"
+#define START_MENU_TEXT "[1] Start Game"
+#define CONTROLS_MENU_TEXT "[2] Controls"
+#define ABOUT_MENU_TEXT "[3] About"
+#define EXIT_MENU_TEXT "[4] Exit"
+#define START_GAME_HEADER "Choose Difficulty"
+#define EASY_GAME_TEXT "[1] Easy (8x8, 10 mines)"
+#define MEDIUM_GAME_TEXT "[2] Medium (16x16, 40 mines)"
+#define HARD_GAME_TEXT "[3] Hard (24x24, 99 mines)"
+#define CONTROLS_HEADER "GAME CONTROLS"
+#define CONTROLS_MOVE_UP "Move Up    - W"
+#define CONTROLS_MOVE_LEFT "Move Left  - A"
+#define CONTROLS_MOVE_DOWN "Move Down  - S"
+#define CONTROLS_MOVE_RIGHT "Move Right - D"
+#define CONTROLS_SELECT "Select     - Space"
+#define CONTROLS_FLAG "Flag       - F"
+#define CONTROLS_RESTART "Restart    - R"
+#define CONTROLS_QUIT_GAME "Quit Game  - Q"
+#define PRESS_ANY_KEY "(Press any key to continue)"
 
 /* Prototypes */
 void drawBackground();
@@ -101,6 +129,7 @@ void startGame();
 int boardLength = 0;
 int selectedX = 0, selectedY = 0;
 int offsetX = 0, offsetY = 0;
+int textBoardOffset = 0;
 int minesLeft;
 int** board;
 int** hiddenBoard;	// lists hidden/unhidden/selected cells
@@ -117,6 +146,7 @@ void initializeBoard(){
 			hiddenBoard[i][j] = HIDDEN;
 		}
 	}
+	hiddenBoard[0][0] = HIDDEN_SELECTED;
 }
 
 void drawBackground(){
@@ -279,7 +309,7 @@ void drawFlag(int i, int j){
 
 void drawCell(int i, int j){
 	int col = (j * CELL_SIZE) + offsetX;
-	int row = (i * CELL_SIZE) + offsetY + TEXT_SIZE + TEXT_BOARD_OFFSET;
+	int row = (i * CELL_SIZE) + offsetY;
 	if(hiddenBoard[i][j] == HIDDEN_SELECTED || hiddenBoard[i][j] == REVEALED_SELECTED) drawBox(col, row, SELECTED_COLOR);
 	else if(hiddenBoard[i][j] == REVEALED_SELECTED && board[i][j] == MINE) drawMineSelected(col, row);
 	if(hiddenBoard[i][j] == HIDDEN) drawBox(col, row, CELL_COLOR);
@@ -303,14 +333,14 @@ void drawBoard(){
 }
 
 void drawStatusLogo(){
-	write_text("MINESWEEPER", 10, offsetY, TEXT_COLOR, 0);
+	write_text("MINESWEEPER", 10, 10, TEXT_COLOR, 0);
 }
 
 void drawStatusMines(){
 	char status[3];
 	sprintf(status, "%d", minesLeft);
-	write_text("MINES LEFT: ", 187, offsetY, TEXT_COLOR, 0);
-	write_text(status, 295, offsetY, TEXT_COLOR, 0);
+	write_text("MINES LEFT: ", 187, 10, TEXT_COLOR, 0);
+	write_text(status, 295, 10, TEXT_COLOR, 0);
 }
 
 void drawStatusBar(){
@@ -319,45 +349,128 @@ void drawStatusBar(){
 }
 
 void drawGame(){
+	drawBackground();
 	drawStatusBar();
 	drawBoard();
 }
 
-void startGame(){
-	initializeBoard();
-	// randomizeMines();
-	hiddenBoard[0][0] = HIDDEN_SELECTED;
-	drawGame();
+void printBoardSizes(){
+	drawBackground();
+	write_text(START_GAME_HEADER, 84, 30, TEXT_COLOR, 1);
+	write_text(EASY_GAME_TEXT, 40, 80, TEXT_COLOR, 0);
+	write_text(MEDIUM_GAME_TEXT, 40, 110, TEXT_COLOR), 0;
+	write_text(HARD_GAME_TEXT, 40, 140, TEXT_COLOR, 0);
+}
 
-	// start here
+void getBoardSize(){
+	char keypress;
+	do{
+		printBoardSizes();
+		keypress = (char) getch();
+		if(keypress == SMALL_KEY){
+			boardLength = SMALL;
+			minesLeft = MEDIUM_MINES;
+			offsetX = SMALL_X_OFFSET;
+		} else if(keypress == MEDIUM_KEY){
+			boardLength = MEDIUM;
+			minesLeft = MEDIUM_MINES;
+			offsetX = MEDIUM_X_OFFSET;
+		} else if(keypress == LARGE_KEY){
+			boardLength = LARGE;
+			minesLeft = LARGE_MINES;
+			offsetX = LARGE_X_OFFSET;
+			textBoardOffset = TEXT_SIZE + TEXT_LARGE_BOARD_OFFSET;
+		}
+	}while(!boardLength);
+	offsetY = (200 + textBoardOffset - (boardLength * 7)) / 2;
+}
+
+void startMinesweeper(){
+	char keypress;
+	// do{
+		keypress = (char) getch();
+	// }while(keypress)
+}
+
+void resetVariables(){
+	freeBoard();
+	selectedX = 0;
+	selectedY = 0;
+	minesLeft = 0;
+	offsetX = 0;
+	offsetY = 0;
+	textBoardOffset = 0;
+}
+
+void randomizeMines(){}
+
+void startGame(){
+	getBoardSize();
+	initializeBoard();
+	randomizeMines();
+	drawGame();	// remove
+	startMinesweeper();
+	resetVariables();
 }
 
 void freeBoard(){
 	int i;
-	for(i = 0; i < boardLength; i++)
+	for(i = 0; i < boardLength; i++){
 		free(board[i]);
+		free(hiddenBoard[i]);
+	}
 	free(board);
+	free(hiddenBoard);
 }
 
-void openGameMenu(){
+void printMainMenu(){
+	drawBackground();
+	write_text(LOGO_MENU_TEXT, 111, 30, TEXT_COLOR, 1);
+	write_text(START_MENU_TEXT, 95, 70, TEXT_COLOR, 0);
+	write_text(CONTROLS_MENU_TEXT, 95, 95, TEXT_COLOR), 0;
+	write_text(ABOUT_MENU_TEXT, 95, 120, TEXT_COLOR, 0);
+	write_text(EXIT_MENU_TEXT, 95, 145, TEXT_COLOR, 0);
+}
+
+void printControlsMenu(){
+	drawBackground();
+	write_text(CONTROLS_HEADER, 102, 30, TEXT_COLOR, 1);
+	write_text(CONTROLS_MOVE_UP, 90, 70, TEXT_COLOR, 0);
+	write_text(CONTROLS_MOVE_LEFT, 90, 80, TEXT_COLOR), 0;
+	write_text(CONTROLS_MOVE_DOWN, 90, 90, TEXT_COLOR, 0);
+	write_text(CONTROLS_MOVE_RIGHT, 90, 100, TEXT_COLOR, 0);
+	write_text(CONTROLS_SELECT, 90, 110, TEXT_COLOR, 0);
+	write_text(CONTROLS_FLAG, 90, 120, TEXT_COLOR, 0);
+	write_text(CONTROLS_RESTART, 90, 130, TEXT_COLOR, 0);
+	write_text(CONTROLS_QUIT_GAME, 90, 140, TEXT_COLOR, 0);
+	write_text(PRESS_ANY_KEY, 43, 160, TEXT_COLOR, 0);
+}
+
+void openControlsMenu(){
 	char keypress;
-	do {
+	printControlsMenu();
+	keypress = (char) getch();
+}
+
+void openAboutMenu(){}
+
+void openMainMenu(){
+	char keypress;
+	do{
+		printMainMenu();
 		keypress = (char) getch();
-		if(keypress == SPACE_KEY){
-			offsetX = LARGE_X_OFFSET;
-			offsetY = (200 - TEXT_SIZE - TEXT_BOARD_OFFSET - (LARGE * 7)) / 2;
-			minesLeft = LARGE_MINES;
-			boardLength = LARGE;
+		if(keypress == START_MENU_KEY)
 			startGame();
-		}
-	}while(keypress != QUIT_KEY);
-	if(boardLength) freeBoard();
+		else if(keypress == CONTROLS_MENU_KEY)
+			openControlsMenu();
+		else if(keypress == ABOUT_MENU_KEY)
+			openAboutMenu(); 
+	}while(keypress != EXIT_MENU_KEY);
 }
 
 int main(){
 	set_graphics(VGA_320X200X256);
-	drawBackground();
-	openGameMenu();
+	openMainMenu();
 	set_graphics(VGA_TEXT80X25X16);
 	clrscr();
 	return 0;
