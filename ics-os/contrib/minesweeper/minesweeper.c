@@ -128,6 +128,7 @@ void updateStatusMinesNum();
 void printBoardSizes();
 void getBoardSize();
 void updateGame();
+void updateSelection(int x, int y, int newX, int newY);
 void moveSelection(int direction);
 void select();
 void flag();
@@ -428,11 +429,18 @@ void updateGame(){
 	drawBoard();
 }
 
+void updateSelection(int x, int y, int newX, int newY){
+	drawCell(y, x);
+	drawCell(newY, newX);
+}
+
 void moveSelection(int direction){
+	int x = selectedX, y = selectedY;
 	if(direction == UP_KEY && selectedY - 1 >= 0) selectedY--;
 	else if(direction == LEFT_KEY && selectedX - 1 >= 0) selectedX--;
 	else if(direction == DOWN_KEY && selectedY + 1 < boardLength) selectedY++;
 	else if(direction == RIGHT_KEY && selectedX + 1 < boardLength) selectedX++;
+	updateSelection(x, y, selectedX, selectedY);
 }
 
 void select(){}
@@ -440,6 +448,7 @@ void select(){}
 void flag(){
 	if(hiddenBoard[selectedY][selectedX] == HIDDEN) hiddenBoard[selectedY][selectedX] = HIDDEN_FLAGGED;
 	else if(hiddenBoard[selectedY][selectedX] == HIDDEN_FLAGGED) hiddenBoard[selectedY][selectedX] = HIDDEN;
+	drawCell(selectedY, selectedX);
 }
 
 void restart(){}
@@ -456,7 +465,6 @@ void startMinesweeper(){
 		else if(keypress == SPACE_KEY) select();
 		else if(keypress == FLAG_KEY) flag();
 		else if(keypress == RESET_KEY) restart();
-		updateGame();
 	}while(keypress != QUIT_KEY);
 }
 
