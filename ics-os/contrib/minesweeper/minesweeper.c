@@ -109,7 +109,6 @@ void initializeBoard();
 void drawBackground();
 void drawBox(int col, int row, int xSize, int ySize, int color);
 void drawMine(int i, int j);
-void drawMineSelected(int i, int j);
 void drawNum1(int i, int j);
 void drawNum2(int i, int j);
 void drawNum3(int i, int j);
@@ -133,6 +132,8 @@ void updateGame();
 void startMinesweeper();
 void resetVariables();
 void randomizeMines();
+void revealAllCells();
+void randomizeBoard();
 void startGame();
 void freeBoard();
 void printMainMenu();
@@ -194,11 +195,6 @@ void drawMine(int i, int j){
 	write_pixel(i + 3, j + 4, MINE_COLOR);
 	write_pixel(i + 4, j + 4, MINE_COLOR);
 	write_pixel(i + 3, j + 5, MINE_COLOR);
-}
-
-void drawMineSelected(int i, int j){
-	drawBox(i, j, CELL_SIZE, CELL_SIZE, MINE_SELECTED_COLOR);
-	drawMine(i, j);
 }
 
 void drawNum1(int i, int j){
@@ -327,9 +323,14 @@ void drawFlag(int i, int j){
 void drawCell(int i, int j){
 	int col = (j * CELL_SIZE) + offsetX;
 	int row = (i * CELL_SIZE) + offsetY;
-	if(hiddenBoard[i][j] == HIDDEN_SELECTED || hiddenBoard[i][j] == REVEALED_SELECTED) drawBox(col, row, CELL_SIZE, CELL_SIZE, SELECTED_COLOR);
-	else if(hiddenBoard[i][j] == REVEALED_SELECTED && board[i][j] == MINE) drawMineSelected(col, row);
-	if(hiddenBoard[i][j] == HIDDEN) drawBox(col, row, CELL_SIZE, CELL_SIZE, CELL_COLOR);
+	if(hiddenBoard[i][j] == REVEALED_SELECTED && board[i][j] == MINE)
+		drawBox(col, row, CELL_SIZE, CELL_SIZE, MINE_SELECTED_COLOR);
+	else if(hiddenBoard[i][j] == REVEALED_SELECTED)
+		drawBox(col, row, CELL_SIZE, CELL_SIZE, SELECTED_COLOR);
+	else if(hiddenBoard[i][j] == REVEALED)
+		drawBox(col, row, CELL_SIZE, CELL_SIZE, EMPTY_COLOR);
+	if(hiddenBoard[i][j] == HIDDEN_SELECTED) drawBox(col, row, CELL_SIZE, CELL_SIZE, SELECTED_COLOR);
+	else if(hiddenBoard[i][j] == HIDDEN) drawBox(col, row, CELL_SIZE, CELL_SIZE, CELL_COLOR);
 	else if(board[i][j] == NUM_1) drawNum1(col, row);
 	else if(board[i][j] == NUM_2) drawNum2(col, row);
 	else if(board[i][j] == NUM_3) drawNum3(col, row);
@@ -362,7 +363,6 @@ void drawStatusMinesNum(){
 	sprintf(status, "%d", minesLeft);
 	write_text(status, 295, 10, TEXT_COLOR, 0);
 }
-
 
 void drawStatusBar(){
 	drawStatusLogo();
@@ -428,6 +428,7 @@ void startMinesweeper(){
 
 void resetVariables(){
 	freeBoard();
+	boardLength = 0;
 	selectedX = 0;
 	selectedY = 0;
 	minesLeft = 0;
@@ -436,13 +437,43 @@ void resetVariables(){
 	textBoardOffset = 0;
 }
 
-void randomizeMines(){}
+void randomizeMines(){
+	int x, y;
+	int mines = minesLeft;
+	while(mines > 0){
+		x = rand() % boardLength;
+		y = rand() % boardLength;
+		if(board[y][x]) continue;
+		board[y][x] = MINE;
+		mines--;
+	}
+}
+
+void revealAllCells(){
+	int i, j;
+	for(i = 0; i < boardLength; i++){
+		for(j = 0; j < boardLength; j++){
+			if(hiddenBoard[i][j] == HIDDEN)
+				hiddenBoard[i][j] = REVEALED;
+			else if(hiddenBoard[i][j] == HIDDEN_SELECTED)
+				hiddenBoard[i][j] = REVEALED_SELECTED;
+		}
+	}
+	drawBoard();
+}
+
+void randomizeBoard(){
+	randomizeMines();
+	// update numbers
+}
 
 void startGame(){
 	getBoardSize();
 	initializeBoard();
-	randomizeMines();
+	randomizeBoard();
 	startMinesweeper();
+		revealAllCells(); // remove
+		char keypress = (char) getch();	// remove
 	resetVariables();
 }
 
@@ -520,6 +551,7 @@ void openMainMenu(){
 }
 
 int main(){
+	srand(time(NULL));
 	set_graphics(VGA_320X200X256);
 	openMainMenu();
 	set_graphics(VGA_TEXT80X25X16);
