@@ -138,6 +138,9 @@ void moveSelection(int direction);
 int isNum(int x, int y);
 int isHidden(int x, int y);
 int revealCells(int x, int y);
+int getNumberOfMines(int num);
+int getNumberOfFlags(int x, int y);
+void selectAllAdjacent();
 int select();
 void updateMinesLeft();
 void flag();
@@ -494,6 +497,48 @@ int revealCells(int x, int y){
 	return 0;
 }
 
+int getNumberOfMines(int num){
+	if(num == EMPTY) return 0;
+	else if(num == NUM_1) return 1;
+	else if(num == NUM_2) return 2;
+	else if(num == NUM_3) return 3;
+	else if(num == NUM_4) return 4;
+	else if(num == NUM_5) return 5;
+	else if(num == NUM_6) return 6;
+	else if(num == NUM_7) return 7;
+	else if(num == NUM_8) return 8;
+	return 0;
+}
+
+int getNumberOfFlags(int x, int y){
+	int flagCtr = 0;
+	if(y - 1 >= 0 && x - 1 >= 0 && hiddenBoard[y - 1][x - 1] == HIDDEN_FLAGGED) flagCtr++;
+	if(y - 1 >= 0 && x + 1 < boardLength && hiddenBoard[y - 1][x + 1] == HIDDEN_FLAGGED) flagCtr++;
+	if(y + 1 < boardLength && x - 1 >= 0 && hiddenBoard[y + 1][x - 1] == HIDDEN_FLAGGED) flagCtr++;
+	if(y + 1 < boardLength && x + 1 < boardLength && hiddenBoard[y + 1][x + 1] == HIDDEN_FLAGGED) flagCtr++;
+	if(y - 1 >= 0 && hiddenBoard[y - 1][x] == HIDDEN_FLAGGED) flagCtr++;
+	if(x - 1 >= 0 && hiddenBoard[y][x - 1] == HIDDEN_FLAGGED) flagCtr++;
+	if(y + 1 < boardLength && hiddenBoard[y + 1][x] == HIDDEN_FLAGGED) flagCtr++;
+	if(x + 1 < boardLength && hiddenBoard[y][x + 1] == HIDDEN_FLAGGED) flagCtr++;
+	return flagCtr;
+}
+
+void selectAllAdjacent(){
+	int x = selectedX, y = selectedY;
+	int numOfMines = getNumberOfMines(board[selectedY][selectedX]);
+	int numOfFlags = getNumberOfFlags(selectedX, selectedY);
+	if(numOfMines == numOfFlags){
+		if(isNum(x - 1, y) && isHidden(x - 1, y)) revealCells(x - 1, y);
+		if(isNum(x, y - 1) && isHidden(x, y - 1)) revealCells(x, y - 1);
+		if(isNum(x + 1, y) && isHidden(x + 1, y)) revealCells(x + 1, y);
+		if(isNum(x, y + 1) && isHidden(x, y + 1)) revealCells(x, y + 1);
+		if(isNum(x - 1, y -1) && isHidden(x - 1, y - 1)) revealCells(x - 1, y - 1);
+		if(isNum(x - 1, y + 1) && isHidden(x - 1, y + 1)) revealCells(x - 1, y + 1);
+		if(isNum(x + 1, y - 1) && isHidden(x + 1, y - 1)) revealCells(x + 1, y - 1);
+		if(isNum(x + 1, y + 1) && isHidden(x + 1, y + 1)) revealCells(x + 1, y + 1);
+	}
+}
+
 int select(int* selectNum){
 	if(!((*selectNum)++)) randomizeBoard();
 	if(hiddenBoard[selectedY][selectedX] == HIDDEN){
@@ -505,6 +550,8 @@ int select(int* selectNum){
 			revealCells(selectedX, selectedY);
 			if(!hiddenCount) return WIN;
 		}
+	} else if(isNum(selectedX, selectedY)){
+		selectAllAdjacent();
 	}
 	return NONE;
 }
