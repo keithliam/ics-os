@@ -548,11 +548,13 @@ int select(int* selectNum){
 			return LOSE;
 		} else {
 			revealCells(selectedX, selectedY);
-			if(!hiddenCount) return WIN;
+			minesLeft = hiddenCount;
+			updateStatusMinesNum();
 		}
 	} else if(isNum(selectedX, selectedY)){
 		selectAllAdjacent();
 	}
+	if(!hiddenCount) return WIN;
 	return NONE;
 }
 
