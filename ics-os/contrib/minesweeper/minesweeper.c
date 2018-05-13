@@ -133,6 +133,8 @@ void startMinesweeper();
 void resetVariables();
 void randomizeMines();
 void revealAllCells();
+int countAdjacentMines(int i, int j);
+void updateNumbers();
 void randomizeBoard();
 void startGame();
 void freeBoard();
@@ -231,9 +233,9 @@ void drawNum3(int i, int j){
 	write_pixel(i + 3, j + 3, NUM_3_COLOR);
 	write_pixel(i + 4, j + 3, NUM_3_COLOR);
 	write_pixel(i + 4, j + 4, NUM_3_COLOR);
-	write_pixel(i + 2, j + 4, NUM_3_COLOR);
-	write_pixel(i + 3, j + 4, NUM_3_COLOR);
-	write_pixel(i + 4, j + 4, NUM_3_COLOR);
+	write_pixel(i + 2, j + 5, NUM_3_COLOR);
+	write_pixel(i + 3, j + 5, NUM_3_COLOR);
+	write_pixel(i + 4, j + 5, NUM_3_COLOR);
 }
 
 void drawNum4(int i, int j){
@@ -462,9 +464,30 @@ void revealAllCells(){
 	drawBoard();
 }
 
+int countAdjacentMines(int i, int j){
+	int mineCtr = 0;
+	if(i - 1 >= 0 && j - 1 >= 0 && board[i - 1][j - 1] == MINE) mineCtr++;
+	if(i - 1 >= 0 && j + 1 < boardLength && board[i - 1][j + 1] == MINE) mineCtr++;
+	if(i + 1 < boardLength && j - 1 >= 0 && board[i + 1][j - 1] == MINE) mineCtr++;
+	if(i + 1 < boardLength && j + 1 < boardLength && board[i + 1][j + 1] == MINE) mineCtr++;
+	if(i - 1 >= 0 && board[i - 1][j] == MINE) mineCtr++;
+	if(j - 1 >= 0 && board[i][j - 1] == MINE) mineCtr++;
+	if(i + 1 < boardLength && board[i + 1][j] == MINE) mineCtr++;
+	if(j + 1 < boardLength && board[i][j + 1] == MINE) mineCtr++;
+	return mineCtr;
+}
+
+void updateNumbers(){
+	int i, j;
+	for(i = 0; i < boardLength; i++)
+		for(j = 0; j < boardLength; j++)
+			if(board[i][j] != MINE)
+				board[i][j] = countAdjacentMines(i, j);
+}
+
 void randomizeBoard(){
 	randomizeMines();
-	// update numbers
+	updateNumbers();
 }
 
 void startGame(){
