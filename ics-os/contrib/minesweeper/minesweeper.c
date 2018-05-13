@@ -307,9 +307,10 @@ void drawStatusLogo(){
 }
 
 void drawStatusMines(){
-	char status[15];
-	sprintf(status, "%s%d", "MINES LEFT: ", minesLeft);
-	write_text(status, 187, offsetY, TEXT_COLOR, 0);
+	char status[3];
+	sprintf(status, "%d", minesLeft);
+	write_text("MINES LEFT: ", 187, offsetY, TEXT_COLOR, 0);
+	write_text(status, 295, offsetY, TEXT_COLOR, 0);
 }
 
 void drawStatusBar(){
