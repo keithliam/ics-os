@@ -135,6 +135,9 @@ void getBoardSize();
 void updateGame();
 void updateSelection(int x, int y, int newX, int newY);
 void moveSelection(int direction);
+int isNum(int x, int y);
+int isHidden(int x, int y);
+int revealCells(int x, int y);
 int select();
 void updateMinesLeft();
 void flag();
@@ -455,15 +458,53 @@ void moveSelection(int direction){
 	updateSelection(x, y, selectedX, selectedY);
 }
 
+int isNum(int x, int y){
+	if(x < 0 || y < 0 || x >= boardLength || y >= boardLength) return 0;
+	if(board[y][x] == EMPTY || board[y][x] == NUM_1 || board[y][x] == NUM_2 ||
+		board[y][x] == NUM_3 || board[y][x] == NUM_4 || board[y][x] == NUM_5 ||
+		board[y][x] == NUM_6 || board[y][x] == NUM_7 || board[y][x] == NUM_8)
+		return 1;
+	else
+		return 0;
+}
+
+int isHidden(int x, int y){
+	if(x < 0 || y < 0 || x >= boardLength || y >= boardLength) return 0;
+	if(hiddenBoard[y][x] == HIDDEN || hiddenBoard[y][x] == HIDDEN_FLAGGED)
+		return 1;
+	else
+		return 0;
+}
+
+int revealCells(int x, int y){
+	if(x < 0 || y < 0 || x >= boardLength || y >= boardLength) return 0;
+	hiddenCount--;
+	hiddenBoard[y][x] = REVEALED;
+	if(board[y][x] == EMPTY){
+		if(isNum(x - 1, y) && isHidden(x - 1, y)) revealCells(x - 1, y);
+		if(isNum(x, y - 1) && isHidden(x, y - 1)) revealCells(x, y - 1);
+		if(isNum(x + 1, y) && isHidden(x + 1, y)) revealCells(x + 1, y);
+		if(isNum(x, y + 1) && isHidden(x, y + 1)) revealCells(x, y + 1);
+		if(isNum(x - 1, y -1) && isHidden(x - 1, y - 1)) revealCells(x - 1, y - 1);
+		if(isNum(x - 1, y + 1) && isHidden(x - 1, y + 1)) revealCells(x - 1, y + 1);
+		if(isNum(x + 1, y - 1) && isHidden(x + 1, y - 1)) revealCells(x + 1, y - 1);
+		if(isNum(x + 1, y + 1) && isHidden(x + 1, y + 1)) revealCells(x + 1, y + 1);
+	}
+	drawCell(y, x);
+	return 0;
+}
+
 int select(int* selectNum){
 	if(!((*selectNum)++)) randomizeBoard();
 	if(hiddenBoard[selectedY][selectedX] == HIDDEN){
-		hiddenCount--;
-		// recursive stuff
-		hiddenBoard[selectedY][selectedX] = REVEALED;
-		drawCell(selectedY, selectedX);
-		if(board[selectedY][selectedX] == MINE) return LOSE;
-		else if(!hiddenCount) return WIN;
+		if(board[selectedY][selectedX] == MINE){
+			hiddenBoard[selectedY][selectedX] = REVEALED;
+			drawCell(selectedY, selectedX);
+			return LOSE;
+		} else {
+			revealCells(selectedX, selectedY);
+			if(!hiddenCount) return WIN;
+		}
 	}
 	return NONE;
 }
