@@ -443,7 +443,14 @@ void moveSelection(int direction){
 	updateSelection(x, y, selectedX, selectedY);
 }
 
-void select(){}
+void select(int* selectNum){
+	if(hiddenBoard[selectedY][selectedX] == HIDDEN){
+		if(!((*selectNum)++)) randomizeBoard();	// move to after first click selection
+		// recursive stuff
+		hiddenBoard[selectedY][selectedX] = REVEALED;
+		drawCell(selectedY, selectedX);
+	}
+}
 
 void flag(){
 	if(hiddenBoard[selectedY][selectedX] == HIDDEN) hiddenBoard[selectedY][selectedX] = HIDDEN_FLAGGED;
@@ -451,10 +458,24 @@ void flag(){
 	drawCell(selectedY, selectedX);
 }
 
-void restart(){}
+void restart(){
+	selectedX = 0;
+	selectedY = 0;
+	if(boardLength == SMALL){
+		minesLeft = SMALL_MINES;
+	} else if(boardLength == MEDIUM){
+		minesLeft = MEDIUM_MINES;
+	} else if(boardLength == LARGE){
+		minesLeft = LARGE_MINES;
+	}
+	freeBoard();
+	initializeBoard();
+	startMinesweeper();
+}
 
 void startMinesweeper(){
 	char keypress;
+	int selectNum = 0;
 	drawGame();
 	do{
 		keypress = (char) getch();
@@ -462,10 +483,11 @@ void startMinesweeper(){
 		else if(keypress == LEFT_KEY) moveSelection(LEFT_KEY);
 		else if(keypress == DOWN_KEY) moveSelection(DOWN_KEY);
 		else if(keypress == RIGHT_KEY) moveSelection(RIGHT_KEY);
-		else if(keypress == SPACE_KEY) select();
+		else if(keypress == SPACE_KEY) select(&selectNum);
 		else if(keypress == FLAG_KEY) flag();
-		else if(keypress == RESET_KEY) restart();
-	}while(keypress != QUIT_KEY);
+	}while(!(keypress == QUIT_KEY || keypress == RESET_KEY));
+	if(keypress == RESET_KEY) restart();
+	else if(keypress == QUIT_KEY && selectNum) revealAllCells();
 }
 
 void resetVariables(){
@@ -498,6 +520,7 @@ void revealAllCells(){
 			if(hiddenBoard[i][j] == HIDDEN || hiddenBoard[i][j] == HIDDEN_FLAGGED)
 				hiddenBoard[i][j] = REVEALED;
 	drawBoard();
+	char keypress = (char) getch();
 }
 
 int countAdjacentMines(int i, int j){
@@ -529,10 +552,7 @@ void randomizeBoard(){
 void startGame(){
 	getBoardSize();
 	initializeBoard();
-	randomizeBoard();	// move to after first click selection
 	startMinesweeper();
-		revealAllCells(); // remove
-		char keypress = (char) getch();	// remove
 	resetVariables();
 }
 
