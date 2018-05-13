@@ -48,9 +48,6 @@
 #define CELL_SIZE 7
 #define TEXT_SIZE 7
 #define TEXT_LARGE_BOARD_OFFSET 5
-#define SMALL_X_OFFSET 76
-#define MEDIUM_X_OFFSET 76
-#define LARGE_X_OFFSET 76
 
 /* Board Sizes */
 #define SMALL 8
@@ -370,18 +367,16 @@ void getBoardSize(){
 		if(keypress == SMALL_KEY){
 			boardLength = SMALL;
 			minesLeft = MEDIUM_MINES;
-			offsetX = SMALL_X_OFFSET;
 		} else if(keypress == MEDIUM_KEY){
 			boardLength = MEDIUM;
 			minesLeft = MEDIUM_MINES;
-			offsetX = MEDIUM_X_OFFSET;
 		} else if(keypress == LARGE_KEY){
 			boardLength = LARGE;
 			minesLeft = LARGE_MINES;
-			offsetX = LARGE_X_OFFSET;
 			textBoardOffset = TEXT_SIZE + TEXT_LARGE_BOARD_OFFSET;
 		}
 	}while(!boardLength);
+	offsetX = (320 - (boardLength * 7)) / 2;
 	offsetY = (200 + textBoardOffset - (boardLength * 7)) / 2;
 }
 
