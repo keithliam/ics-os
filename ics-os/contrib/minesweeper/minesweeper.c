@@ -153,7 +153,7 @@ void announceWin();
 void startMinesweeper();
 void resetVariables();
 void randomizeMines();
-char revealAllCells();
+char revealAllMines();
 int countAdjacentMines(int i, int j);
 void updateNumbers();
 void randomizeBoard();
@@ -615,7 +615,7 @@ void startMinesweeper(){
 		else if(keypress == FLAG_KEY) flag();
 	}while(!(keypress == QUIT_KEY || keypress == RESET_KEY) && endGame == NONE);
 	if(keypress == RESET_KEY) restart();
-	else if(((keypress == QUIT_KEY && selectNum) || endGame) && revealAllCells() == RESET_KEY) restart();
+	else if(((keypress == QUIT_KEY && selectNum) || endGame) && revealAllMines() == RESET_KEY) restart();
 	if(endGame == WIN) announceWin();
 }
 
@@ -645,11 +645,11 @@ void randomizeMines(){
 	}
 }
 
-char revealAllCells(){
+char revealAllMines(){
 	int i, j;
 	for(i = 0; i < boardLength; i++)
 		for(j = 0; j < boardLength; j++)
-			if(hiddenBoard[i][j] == HIDDEN || hiddenBoard[i][j] == HIDDEN_FLAGGED)
+			if((hiddenBoard[i][j] == HIDDEN || hiddenBoard[i][j] == HIDDEN_FLAGGED) && board[i][j] == MINE)
 				hiddenBoard[i][j] = REVEALED;
 	drawBoard();
 	return (char) getch();
