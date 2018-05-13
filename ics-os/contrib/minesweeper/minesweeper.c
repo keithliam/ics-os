@@ -616,7 +616,11 @@ void startMinesweeper(){
 	}while(!(keypress == QUIT_KEY || keypress == RESET_KEY) && endGame == NONE);
 	if(keypress == RESET_KEY) restart();
 	else if(((keypress == QUIT_KEY && selectNum) || endGame) && revealAllMines() == RESET_KEY) restart();
-	if(endGame == WIN) announceWin();
+	if(endGame == WIN){
+		minesLeft = 0;
+		announceWin();
+		updateStatusMinesNum();
+	}
 }
 
 void resetVariables(){
