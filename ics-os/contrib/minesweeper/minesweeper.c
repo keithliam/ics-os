@@ -319,8 +319,8 @@ void drawStatusBar(){
 }
 
 void drawGame(){
-	drawBoard();
 	drawStatusBar();
+	drawBoard();
 }
 
 void startGame(){
