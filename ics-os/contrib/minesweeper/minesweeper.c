@@ -89,6 +89,8 @@
 #define EASY_GAME_TEXT "[1] Easy (8x8, 10 mines)"
 #define MEDIUM_GAME_TEXT "[2] Medium (16x16, 40 mines)"
 #define HARD_GAME_TEXT "[3] Hard (24x24, 99 mines)"
+#define STATUS_LOGO "MINESWEEPER"
+#define STATUS_MINES_LEFT "MINES LEFT: "
 #define CONTROLS_HEADER "GAME CONTROLS"
 #define CONTROLS_MOVE_UP "Move Up    - W"
 #define CONTROLS_MOVE_LEFT "Move Left  - A"
@@ -380,11 +382,11 @@ void drawBoard(){
 }
 
 void drawStatusLogo(){
-	write_text("MINESWEEPER", 10, 10, TEXT_COLOR, 0);		// change to constant
+	write_text(STATUS_LOGO, 10, 10, TEXT_COLOR, 0);
 }
 
 void drawStatusMines(){
-	write_text("MINES LEFT: ", 187, 10, TEXT_COLOR, 0);			// change to constant
+	write_text(STATUS_MINES_LEFT, 187, 10, TEXT_COLOR, 0);
 }
 
 void drawStatusMinesNum(){
