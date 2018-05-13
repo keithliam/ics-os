@@ -91,6 +91,7 @@
 #define HARD_GAME_TEXT "[3] Hard (24x24, 99 mines)"
 #define STATUS_LOGO "MINESWEEPER"
 #define STATUS_MINES_LEFT "MINES LEFT: "
+#define WIN_TEXT "YOU WIN!"
 #define CONTROLS_HEADER "GAME CONTROLS"
 #define CONTROLS_MOVE_UP "Move Up    - W"
 #define CONTROLS_MOVE_LEFT "Move Left  - A"
@@ -147,6 +148,7 @@ int select();
 void updateMinesLeft();
 void flag();
 void restart();
+void printWinText();
 void announceWin();
 void startMinesweeper();
 void resetVariables();
@@ -589,9 +591,14 @@ void restart(){
 	startMinesweeper();
 }
 
+void printWinText(){
+	write_text(WIN_TEXT, 124, 80, TEXT_COLOR, 1);
+	write_text(PRESS_ANY_KEY, 43, 160, TEXT_COLOR, 0);
+}
+
 void announceWin(){
 	drawBackground();
-	// you win!!
+	printWinText();
 	char keypress = (char) getch();
 	if(keypress == RESET_KEY) restart();
 }
