@@ -107,7 +107,7 @@
 /* Prototypes */
 void initializeBoard();
 void drawBackground();
-void drawBox(int col, int row, int color);
+void drawBox(int col, int row, int xSize, int ySize, int color);
 void drawMine(int i, int j);
 void drawMineSelected(int i, int j);
 void drawNum1(int i, int j);
@@ -123,10 +123,13 @@ void drawCell(int i, int j);
 void drawBoard();
 void drawStatusLogo();
 void drawStatusMines();
+void drawStatusMinesNum();
 void drawStatusBar();
 void drawGame();
+void updateStatusMinesNum();
 void printBoardSizes();
 void getBoardSize();
+void updateGame();
 void startMinesweeper();
 void resetVariables();
 void randomizeMines();
@@ -170,10 +173,10 @@ void drawBackground(){
 			write_pixel(i, j, BACKGROUND_COLOR);
 }
 
-void drawBox(int col, int row, int color){
+void drawBox(int col, int row, int xSize, int ySize, int color){
 	int i, j;
-	for(i = 0; i < CELL_SIZE; i++)
-		for(j = 0; j < CELL_SIZE; j++)
+	for(j = 0; j < xSize; j++)
+		for(i = 0; i < ySize; i++)
 			write_pixel(col + j, row + i, color);
 }
 
@@ -194,7 +197,7 @@ void drawMine(int i, int j){
 }
 
 void drawMineSelected(int i, int j){
-	drawBox(i, j, MINE_SELECTED_COLOR);
+	drawBox(i, j, CELL_SIZE, CELL_SIZE, MINE_SELECTED_COLOR);
 	drawMine(i, j);
 }
 
@@ -324,9 +327,9 @@ void drawFlag(int i, int j){
 void drawCell(int i, int j){
 	int col = (j * CELL_SIZE) + offsetX;
 	int row = (i * CELL_SIZE) + offsetY;
-	if(hiddenBoard[i][j] == HIDDEN_SELECTED || hiddenBoard[i][j] == REVEALED_SELECTED) drawBox(col, row, SELECTED_COLOR);
+	if(hiddenBoard[i][j] == HIDDEN_SELECTED || hiddenBoard[i][j] == REVEALED_SELECTED) drawBox(col, row, CELL_SIZE, CELL_SIZE, SELECTED_COLOR);
 	else if(hiddenBoard[i][j] == REVEALED_SELECTED && board[i][j] == MINE) drawMineSelected(col, row);
-	if(hiddenBoard[i][j] == HIDDEN) drawBox(col, row, CELL_COLOR);
+	if(hiddenBoard[i][j] == HIDDEN) drawBox(col, row, CELL_SIZE, CELL_SIZE, CELL_COLOR);
 	else if(board[i][j] == NUM_1) drawNum1(col, row);
 	else if(board[i][j] == NUM_2) drawNum2(col, row);
 	else if(board[i][j] == NUM_3) drawNum3(col, row);
@@ -351,15 +354,20 @@ void drawStatusLogo(){
 }
 
 void drawStatusMines(){
+	write_text("MINES LEFT: ", 187, 10, TEXT_COLOR, 0);
+}
+
+void drawStatusMinesNum(){
 	char status[3];
 	sprintf(status, "%d", minesLeft);
-	write_text("MINES LEFT: ", 187, 10, TEXT_COLOR, 0);
 	write_text(status, 295, 10, TEXT_COLOR, 0);
 }
+
 
 void drawStatusBar(){
 	drawStatusLogo();
 	drawStatusMines();
+	drawStatusMinesNum();
 }
 
 void drawGame(){
@@ -367,6 +375,12 @@ void drawGame(){
 	drawStatusBar();
 	drawBoard();
 }
+
+void updateStatusMinesNum(){
+	drawBox(295, 10, 18, 7, BACKGROUND_COLOR);
+	drawStatusMinesNum();
+}
+
 
 void printBoardSizes(){
 	drawBackground();
@@ -397,11 +411,18 @@ void getBoardSize(){
 	offsetY = (200 + textBoardOffset - (boardLength * 7)) / 2;
 }
 
+void updateGame(){
+	updateStatusMinesNum();
+	drawBoard();
+}
+
 void startMinesweeper(){
 	char keypress;
+	drawGame();
 	do{
-		drawGame();
 		keypress = (char) getch();
+		// hehe
+		updateGame();
 	}while(keypress != QUIT_KEY);
 }
 
@@ -484,8 +505,8 @@ void openAboutMenu(){
 
 void openMainMenu(){
 	char keypress;
+	printMainMenu();
 	do{
-		printMainMenu();
 		keypress = (char) getch();
 		if(keypress == START_MENU_KEY)
 			startGame();
@@ -493,6 +514,8 @@ void openMainMenu(){
 			openControlsMenu();
 		else if(keypress == ABOUT_MENU_KEY)
 			openAboutMenu(); 
+		if(keypress == START_MENU_KEY || keypress == CONTROLS_MENU_KEY || keypress == ABOUT_MENU_KEY)
+			printMainMenu();
 	}while(keypress != EXIT_MENU_KEY);
 }
 
