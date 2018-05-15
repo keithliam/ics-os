@@ -723,7 +723,6 @@ void hideMainMenu(){
 }
 
 void printControlsMenu(){
-	drawBackground();
 	write_text(CONTROLS_HEADER, 102, 30, TEXT_COLOR, 1);
 	write_text(CONTROLS_MOVE_UP, 90, 70, TEXT_COLOR, 0);
 	write_text(CONTROLS_MOVE_LEFT, 90, 80, TEXT_COLOR), 0;
@@ -756,7 +755,6 @@ void openControlsMenu(){
 }
 
 void printAboutMenu(){
-	drawBackground();
 	write_text(ABOUT_HEADER, 138, 30, TEXT_COLOR, 1);
 	write_text(ABOUT_PROJECT_INFO_1, 102, 62, TEXT_COLOR), 0;
 	write_text(ABOUT_PROJECT_INFO_2, 111, 72, TEXT_COLOR, 0);
