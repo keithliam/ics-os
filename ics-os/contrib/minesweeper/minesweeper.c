@@ -653,9 +653,10 @@ char revealAllMines(){
 	int i, j;
 	for(i = 0; i < boardLength; i++)
 		for(j = 0; j < boardLength; j++)
-			if((hiddenBoard[i][j] == HIDDEN || hiddenBoard[i][j] == HIDDEN_FLAGGED) && board[i][j] == MINE)
+			if((hiddenBoard[i][j] == HIDDEN || hiddenBoard[i][j] == HIDDEN_FLAGGED) && board[i][j] == MINE){
 				hiddenBoard[i][j] = REVEALED;
-	drawBoard();
+				drawCell(i, j);
+			}
 	return (char) getch();
 }
 
