@@ -134,6 +134,7 @@ void drawStatusBar();
 void drawGame();
 void updateStatusMinesNum();
 void printBoardSizes();
+void hideBoardSizes();
 void getBoardSize();
 void updateGame();
 void updateSelection(int x, int y, int newX, int newY);
@@ -407,7 +408,6 @@ void drawStatusBar(){
 }
 
 void drawGame(){
-	drawBackground();
 	drawStatusBar();
 	drawBoard();
 }
@@ -417,12 +417,18 @@ void updateStatusMinesNum(){
 	drawStatusMinesNum();
 }
 
-
 void printBoardSizes(){
 	write_text(START_GAME_HEADER, 84, 30, TEXT_COLOR, 1);
 	write_text(EASY_GAME_TEXT, 40, 80, TEXT_COLOR, 0);
 	write_text(MEDIUM_GAME_TEXT, 40, 110, TEXT_COLOR), 0;
 	write_text(HARD_GAME_TEXT, 40, 140, TEXT_COLOR, 0);
+}
+
+void hideBoardSizes(){
+	write_text(START_GAME_HEADER, 84, 30, BACKGROUND_COLOR, 1);
+	write_text(EASY_GAME_TEXT, 40, 80, BACKGROUND_COLOR, 0);
+	write_text(MEDIUM_GAME_TEXT, 40, 110, BACKGROUND_COLOR), 0;
+	write_text(HARD_GAME_TEXT, 40, 140, BACKGROUND_COLOR, 0);
 }
 
 void getBoardSize(){
@@ -447,6 +453,7 @@ void getBoardSize(){
 	hiddenCount = (boardLength * boardLength) - initialMines;
 	offsetX = (320 - (boardLength * 7)) / 2;
 	offsetY = (200 + textBoardOffset - (boardLength * 7)) / 2;
+	hideBoardSizes();
 }
 
 void updateGame(){
