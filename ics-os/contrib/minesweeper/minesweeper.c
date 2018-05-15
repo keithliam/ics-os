@@ -160,9 +160,12 @@ void randomizeBoard();
 void startGame();
 void freeBoard();
 void printMainMenu();
+void hideMainMenu();
 void printControlsMenu();
+void hideControlsMenu();
 void openControlsMenu();
 void printAboutMenu();
+void hideAboutMenu();
 void openAboutMenu();
 void openMainMenu();
 
@@ -416,7 +419,6 @@ void updateStatusMinesNum(){
 
 
 void printBoardSizes(){
-	drawBackground();
 	write_text(START_GAME_HEADER, 84, 30, TEXT_COLOR, 1);
 	write_text(EASY_GAME_TEXT, 40, 80, TEXT_COLOR, 0);
 	write_text(MEDIUM_GAME_TEXT, 40, 110, TEXT_COLOR), 0;
@@ -425,8 +427,9 @@ void printBoardSizes(){
 
 void getBoardSize(){
 	char keypress;
+	hideMainMenu();
+	printBoardSizes();
 	do{
-		printBoardSizes();
 		keypress = (char) getch();
 		if(keypress == SMALL_KEY){
 			boardLength = SMALL;
@@ -704,12 +707,19 @@ void freeBoard(){
 }
 
 void printMainMenu(){
-	drawBackground();
 	write_text(LOGO_MENU_TEXT, 111, 30, TEXT_COLOR, 1);
 	write_text(START_MENU_TEXT, 95, 70, TEXT_COLOR, 0);
 	write_text(CONTROLS_MENU_TEXT, 95, 95, TEXT_COLOR), 0;
 	write_text(ABOUT_MENU_TEXT, 95, 120, TEXT_COLOR, 0);
 	write_text(EXIT_MENU_TEXT, 95, 145, TEXT_COLOR, 0);
+}
+
+void hideMainMenu(){
+	write_text(LOGO_MENU_TEXT, 111, 30, BACKGROUND_COLOR, 1);
+	write_text(START_MENU_TEXT, 95, 70, BACKGROUND_COLOR, 0);
+	write_text(CONTROLS_MENU_TEXT, 95, 95, BACKGROUND_COLOR), 0;
+	write_text(ABOUT_MENU_TEXT, 95, 120, BACKGROUND_COLOR, 0);
+	write_text(EXIT_MENU_TEXT, 95, 145, BACKGROUND_COLOR, 0);
 }
 
 void printControlsMenu(){
@@ -724,6 +734,19 @@ void printControlsMenu(){
 	write_text(CONTROLS_RESTART, 90, 130, TEXT_COLOR, 0);
 	write_text(CONTROLS_QUIT_GAME, 90, 140, TEXT_COLOR, 0);
 	write_text(PRESS_ANY_KEY, 43, 160, TEXT_COLOR, 0);
+}
+
+void hideControlsMenu(){
+	write_text(CONTROLS_HEADER, 102, 30, BACKGROUND_COLOR, 1);
+	write_text(CONTROLS_MOVE_UP, 90, 70, BACKGROUND_COLOR, 0);
+	write_text(CONTROLS_MOVE_LEFT, 90, 80, BACKGROUND_COLOR), 0;
+	write_text(CONTROLS_MOVE_DOWN, 90, 90, BACKGROUND_COLOR, 0);
+	write_text(CONTROLS_MOVE_RIGHT, 90, 100, BACKGROUND_COLOR, 0);
+	write_text(CONTROLS_SELECT, 90, 110, BACKGROUND_COLOR, 0);
+	write_text(CONTROLS_FLAG, 90, 120, BACKGROUND_COLOR, 0);
+	write_text(CONTROLS_RESTART, 90, 130, BACKGROUND_COLOR, 0);
+	write_text(CONTROLS_QUIT_GAME, 90, 140, BACKGROUND_COLOR, 0);
+	write_text(PRESS_ANY_KEY, 43, 160, BACKGROUND_COLOR, 0);
 }
 
 void openControlsMenu(){
@@ -744,6 +767,17 @@ void printAboutMenu(){
 	write_text(PRESS_ANY_KEY, 43, 160, TEXT_COLOR, 0);
 }
 
+void hideAboutMenu(){
+	write_text(ABOUT_HEADER, 138, 30, BACKGROUND_COLOR, 1);
+	write_text(ABOUT_PROJECT_INFO_1, 102, 62, BACKGROUND_COLOR), 0;
+	write_text(ABOUT_PROJECT_INFO_2, 111, 72, BACKGROUND_COLOR, 0);
+	write_text(ABOUT_UI, 124, 90, BACKGROUND_COLOR, 0);
+	write_text(ABOUT_UI_TEXT, 75, 105, BACKGROUND_COLOR, 0);
+	write_text(ABOUT_IMPLEMENTATION, 93, 125, BACKGROUND_COLOR, 0);
+	write_text(ABOUT_IMPLEMENTATION_TEXT, 79, 138, BACKGROUND_COLOR, 0);
+	write_text(PRESS_ANY_KEY, 43, 160, BACKGROUND_COLOR, 0);
+}
+
 void openAboutMenu(){
 	char keypress;
 	printAboutMenu();
@@ -752,15 +786,22 @@ void openAboutMenu(){
 
 void openMainMenu(){
 	char keypress;
+	drawBackground();
 	printMainMenu();
 	do{
 		keypress = (char) getch();
-		if(keypress == START_MENU_KEY)
+		if(keypress == START_MENU_KEY){
 			startGame();
-		else if(keypress == CONTROLS_MENU_KEY)
+			drawBackground();
+		} else if(keypress == CONTROLS_MENU_KEY){
+			hideMainMenu();
 			openControlsMenu();
-		else if(keypress == ABOUT_MENU_KEY)
+			hideControlsMenu();
+		} else if(keypress == ABOUT_MENU_KEY){
+			hideMainMenu();
 			openAboutMenu(); 
+			hideAboutMenu();
+		}
 		if(keypress == START_MENU_KEY || keypress == CONTROLS_MENU_KEY || keypress == ABOUT_MENU_KEY)
 			printMainMenu();
 	}while(keypress != EXIT_MENU_KEY);
