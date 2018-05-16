@@ -1,3 +1,9 @@
+## How to Run Minesweeper
+```console
+$ cd ics-os
+$ ./run
+```
+
 ## About
 
 Modern real-world operating systems are too complex to be taught to undergraduates and other instructional operating systems are not complete and usable and do not work on real hardware. By providing students with a _not so complex_ working operating system to play with, they will be able to appreciate and understand deeper the concepts underlying an operating system.
