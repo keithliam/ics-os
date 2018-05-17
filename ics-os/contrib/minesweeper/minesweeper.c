@@ -112,10 +112,10 @@
 
 /* Prototypes */
 int select();
+int isFlag(int x, int y);
 int isNum(int x, int y);
 int isHidden(int x, int y);
 int isSelected(int i, int j);
-int revealCells(int x, int y);
 int getNumberOfMines(int num);
 int getNumberOfFlags(int x, int y);
 int countAdjacentMines(int i, int j);
@@ -147,7 +147,9 @@ void openChooseDifficultyMenu();
 void updateGame();
 void updateTwoCells(int x, int y, int newX, int newY);
 void moveSelection(int direction);
-void selectAllAdjacent();
+int revealCells(int x, int y);
+int hasWrongFlag();
+int selectAllAdjacent();
 void updateMinesLeft();
 void flag();
 void restart();
@@ -446,7 +448,16 @@ void moveSelection(int direction){
 	updateTwoCells(x, y, selectionX, selectionY);
 }
 
-/* returns 1 if the specified cell is a number of adjacent cells, else 0 */
+/* returns 1 if the specified cell is a flag, else 0 */
+int isFlag(int x, int y){
+	if(x < 0 || y < 0 || x >= boardLength || y >= boardLength) return 0;
+	if(hiddenBoard[y][x] == HIDDEN_FLAGGED)
+		return 1;
+	else
+		return 0;
+}
+
+/* returns 1 if the specified cell is a number of adjacent mines, else 0 */
 int isNum(int x, int y){
 	if(x < 0 || y < 0 || x >= boardLength || y >= boardLength) return 0;
 	if(board[y][x] == EMPTY || board[y][x] == NUM_1 || board[y][x] == NUM_2 ||
@@ -468,21 +479,21 @@ int isHidden(int x, int y){
 
 /* recursively reveals the specified cell's content and its adjacent empty cells until a numbered cell or board edge is encountered */
 int revealCells(int x, int y){
-	if(x < 0 || y < 0 || x >= boardLength || y >= boardLength) return 0;
+	if(x < 0 || y < 0 || x >= boardLength || y >= boardLength) return NONE;
 	hiddenCount--;
 	hiddenBoard[y][x] = REVEALED;
 	if(board[y][x] == EMPTY){
-		if(isNum(x - 1, y) && isHidden(x - 1, y)) revealCells(x - 1, y);
-		if(isNum(x, y - 1) && isHidden(x, y - 1)) revealCells(x, y - 1);
-		if(isNum(x + 1, y) && isHidden(x + 1, y)) revealCells(x + 1, y);
-		if(isNum(x, y + 1) && isHidden(x, y + 1)) revealCells(x, y + 1);
-		if(isNum(x - 1, y -1) && isHidden(x - 1, y - 1)) revealCells(x - 1, y - 1);
-		if(isNum(x - 1, y + 1) && isHidden(x - 1, y + 1)) revealCells(x - 1, y + 1);
-		if(isNum(x + 1, y - 1) && isHidden(x + 1, y - 1)) revealCells(x + 1, y - 1);
-		if(isNum(x + 1, y + 1) && isHidden(x + 1, y + 1)) revealCells(x + 1, y + 1);
+		if(!isFlag(x - 1, y) && isHidden(x - 1, y)) revealCells(x - 1, y);
+		if(!isFlag(x, y - 1) && isHidden(x, y - 1)) revealCells(x, y - 1);
+		if(!isFlag(x + 1, y) && isHidden(x + 1, y)) revealCells(x + 1, y);
+		if(!isFlag(x, y + 1) && isHidden(x, y + 1)) revealCells(x, y + 1);
+		if(!isFlag(x - 1, y -1) && isHidden(x - 1, y - 1)) revealCells(x - 1, y - 1);
+		if(!isFlag(x - 1, y + 1) && isHidden(x - 1, y + 1)) revealCells(x - 1, y + 1);
+		if(!isFlag(x + 1, y - 1) && isHidden(x + 1, y - 1)) revealCells(x + 1, y - 1);
+		if(!isFlag(x + 1, y + 1) && isHidden(x + 1, y + 1)) revealCells(x + 1, y + 1);
 	}
 	drawCell(y, x);
-	return 0;
+	return NONE;
 }
 
 /* returns the number of mines based on the specified cell's content */
@@ -513,21 +524,37 @@ int getNumberOfFlags(int x, int y){
 	return flagCtr;
 }
 
+/* returns 0 if the highlighted cell has an unflagged adjacent mine, else 0 */
+int hasWrongFlag(){
+	int x = selectionX, y = selectionY;
+	if(y - 1 >= 0 && x - 1 >= 0 && hiddenBoard[y - 1][x - 1] == HIDDEN_FLAGGED && board[y - 1][x - 1] != MINE) return 1;
+	if(y - 1 >= 0 && x + 1 < boardLength && hiddenBoard[y - 1][x + 1] == HIDDEN_FLAGGED && board[y - 1][x + 1] != MINE) return 1;
+	if(y + 1 < boardLength && x - 1 >= 0 && hiddenBoard[y + 1][x - 1] == HIDDEN_FLAGGED && board[y + 1][x - 1] != MINE) return 1;
+	if(y + 1 < boardLength && x + 1 < boardLength && hiddenBoard[y + 1][x + 1] == HIDDEN_FLAGGED && board[y + 1][x + 1] != MINE) return 1;
+	if(y - 1 >= 0 && hiddenBoard[y - 1][x] == HIDDEN_FLAGGED && board[y - 1][x] != MINE) return 1;
+	if(x - 1 >= 0 && hiddenBoard[y][x - 1] == HIDDEN_FLAGGED && board[y][x - 1] != MINE) return 1;
+	if(y + 1 < boardLength && hiddenBoard[y + 1][x] == HIDDEN_FLAGGED && board[y + 1][x] != MINE) return 1;
+	if(x + 1 < boardLength && hiddenBoard[y][x + 1] == HIDDEN_FLAGGED && board[y][x + 1] != MINE) return 1;
+	return 0;
+}
+
 /* recursively reveals the highlighted number's adjacent empty cells until a numbered cell or board edge is encountered */
-void selectAllAdjacent(){
+int selectAllAdjacent(){
 	int x = selectionX, y = selectionY;
 	int numOfMines = getNumberOfMines(board[selectionY][selectionX]);
 	int numOfFlags = getNumberOfFlags(selectionX, selectionY);
 	if(numOfMines == numOfFlags){
-		if(isNum(x - 1, y) && isHidden(x - 1, y)) revealCells(x - 1, y);
-		if(isNum(x, y - 1) && isHidden(x, y - 1)) revealCells(x, y - 1);
-		if(isNum(x + 1, y) && isHidden(x + 1, y)) revealCells(x + 1, y);
-		if(isNum(x, y + 1) && isHidden(x, y + 1)) revealCells(x, y + 1);
-		if(isNum(x - 1, y -1) && isHidden(x - 1, y - 1)) revealCells(x - 1, y - 1);
-		if(isNum(x - 1, y + 1) && isHidden(x - 1, y + 1)) revealCells(x - 1, y + 1);
-		if(isNum(x + 1, y - 1) && isHidden(x + 1, y - 1)) revealCells(x + 1, y - 1);
-		if(isNum(x + 1, y + 1) && isHidden(x + 1, y + 1)) revealCells(x + 1, y + 1);
+		if(hasWrongFlag()) return LOSE;
+		if(!isFlag(x - 1, y) && isHidden(x - 1, y)) revealCells(x - 1, y);
+		if(!isFlag(x, y - 1) && isHidden(x, y - 1)) revealCells(x, y - 1);
+		if(!isFlag(x + 1, y) && isHidden(x + 1, y)) revealCells(x + 1, y);
+		if(!isFlag(x, y + 1) && isHidden(x, y + 1)) revealCells(x, y + 1);
+		if(!isFlag(x - 1, y -1) && isHidden(x - 1, y - 1)) revealCells(x - 1, y - 1);
+		if(!isFlag(x - 1, y + 1) && isHidden(x - 1, y + 1)) revealCells(x - 1, y + 1);
+		if(!isFlag(x + 1, y - 1) && isHidden(x + 1, y - 1)) revealCells(x + 1, y - 1);
+		if(!isFlag(x + 1, y + 1) && isHidden(x + 1, y + 1)) revealCells(x + 1, y + 1);
 	}
+	return NONE;
 }
 
 /* recursively reveals the highlighted cell's content and its adjacent empty cells until a numbered cell or board edge is encountered */
@@ -542,7 +569,7 @@ int select(int* selectNum){
 			revealCells(selectionX, selectionY);
 		}
 	} else if(isNum(selectionX, selectionY)){
-		selectAllAdjacent();
+		if(selectAllAdjacent() == LOSE) return LOSE;
 	}
 	if(!hiddenCount) return WIN;
 	return NONE;
@@ -595,7 +622,7 @@ void startMinesweeper(){
 		else if(keypress == FLAG_KEY) flag();
 	}while(!(keypress == QUIT_KEY || keypress == RESET_KEY) && endGame == NONE);
 	if(keypress == RESET_KEY) restart();
-	else if(((keypress == QUIT_KEY && selectNum) || endGame) && revealAllMines() == RESET_KEY) restart();
+	else if(((keypress == QUIT_KEY && selectNum) || endGame == WIN || endGame == LOSE) && revealAllMines() == RESET_KEY) restart();
 	if(endGame == WIN){
 		minesLeft = 0;
 		openWinAnnouncementMenu();
