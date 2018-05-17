@@ -12,7 +12,6 @@ This will automatically compile and boot ICS-OS.
 
 Inside ICS-OS, type the following:
 ```console
-$ cd apps
 $ mines.exe
 ```
 
