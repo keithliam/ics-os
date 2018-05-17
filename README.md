@@ -1,10 +1,22 @@
-## How to Run Minesweeper
+## Setting Up ICS-OS and Minesweeper
+
+In your terminal, type the following:
 ```console
-$ cd ics-os
+$ git clone https://github.com/keithliam/ics-os-minesweeper.git
+$ cd ics-os/ics-os
 $ ./run
 ```
+This will automatically compile and boot ICS-OS.
 
-## About
+## Running Minesweeper
+
+Inside ICS-OS, type the following:
+```console
+$ cd apps
+$ mines.exe
+```
+
+## About ICS-OS
 
 Modern real-world operating systems are too complex to be taught to undergraduates and other instructional operating systems are not complete and usable and do not work on real hardware. By providing students with a _not so complex_ working operating system to play with, they will be able to appreciate and understand deeper the concepts underlying an operating system.
 
