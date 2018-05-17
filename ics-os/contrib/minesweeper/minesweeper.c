@@ -111,6 +111,15 @@
 #define PRESS_ANY_KEY "(Press any key to continue)"
 
 /* Prototypes */
+int select();
+int isNum(int x, int y);
+int isHidden(int x, int y);
+int isSelected(int i, int j);
+int revealCells(int x, int y);
+int getNumberOfMines(int num);
+int getNumberOfFlags(int x, int y);
+int countAdjacentMines(int i, int j);
+char revealAllMines();
 void initializeBoard();
 void drawBackground();
 void drawBox(int col, int row, int xSize, int ySize, int color);
@@ -124,7 +133,6 @@ void drawNum6(int i, int j);
 void drawNum7(int i, int j);
 void drawNum8(int i, int j);
 void drawFlag(int i, int j);
-int isSelected(int i, int j);
 void drawCell(int i, int j);
 void drawBoard();
 void drawStatusLogo();
@@ -133,69 +141,48 @@ void drawStatusMinesNum();
 void drawStatusBar();
 void drawGame();
 void updateStatusMinesNum();
-void printBoardSizes();
-void hideBoardSizes();
-void getBoardSize();
+void printChooseDifficultyMenuText();
+void hideChooseDifficultyMenu();
+void openChooseDifficultyMenu();
 void updateGame();
-void updateSelection(int x, int y, int newX, int newY);
+void updateTwoCells(int x, int y, int newX, int newY);
 void moveSelection(int direction);
-int isNum(int x, int y);
-int isHidden(int x, int y);
-int revealCells(int x, int y);
-int getNumberOfMines(int num);
-int getNumberOfFlags(int x, int y);
 void selectAllAdjacent();
-int select();
 void updateMinesLeft();
 void flag();
 void restart();
-void printWinText();
-void announceWin();
+void printWinAnnouncementText();
+void openWinAnnouncementMenu();
 void startMinesweeper();
 void resetVariables();
 void randomizeMines();
-char revealAllMines();
-int countAdjacentMines(int i, int j);
 void updateNumbers();
 void randomizeBoard();
 void startGame();
 void freeBoard();
-void printMainMenu();
-void hideMainMenu();
-void printControlsMenu();
-void hideControlsMenu();
+void printMainMenuText();
+void hideMainMenuText();
+void printControlsMenuText();
+void hideControlsMenuText();
 void openControlsMenu();
-void printAboutMenu();
-void hideAboutMenu();
+void printAboutMenuText();
+void hideAboutMenuText();
 void openAboutMenu();
 void openMainMenu();
 
 /* Global Variables */
 int boardLength = 0;
-int selectedX = 0, selectedY = 0;
+int selectionX = 0, selectionY = 0;
 int offsetX = 0, offsetY = 0;
 int textBoardOffset = 0;
 int hiddenCount;
 int initialMines;
 int minesLeft;
 int flagCount = 0;
-int** board;
-int** hiddenBoard;	// lists hidden/unhidden/selected cells
+int** board;		// lists no. of mines & location of mines
+int** hiddenBoard;	// lists hidden, unhidden, selected cells
 
-void initializeBoard(){
-	int i, j;
-	board = (int**) malloc(sizeof(int*) * boardLength);
-	hiddenBoard = (int**) malloc(sizeof(int*) * boardLength);
-	for(i = 0; i < boardLength; i++){
-		board[i] = (int*) malloc(sizeof(int) * boardLength);
-		hiddenBoard[i] = (int*) malloc(sizeof(int) * boardLength);
-		for(j = 0; j < boardLength; j++){
-			board[i][j] = EMPTY;
-			hiddenBoard[i][j] = HIDDEN;
-		}
-	}
-}
-
+/* renders a 320x200 box */
 void drawBackground(){
 	int i, j;
 	for(j = 0; j < 200; j++)
@@ -203,6 +190,7 @@ void drawBackground(){
 			write_pixel(i, j, BACKGROUND_COLOR);
 }
 
+/* renders a box based on specified location, dimensions, and color */
 void drawBox(int col, int row, int xSize, int ySize, int color){
 	int i, j;
 	for(j = 0; j < xSize; j++)
@@ -210,6 +198,7 @@ void drawBox(int col, int row, int xSize, int ySize, int color){
 			write_pixel(col + j, row + i, color);
 }
 
+/* renders a graphical representation of a mine */
 void drawMine(int i, int j){
 	write_pixel(i + 3, j + 1, MINE_COLOR);
 	write_pixel(i + 2, j + 2, MINE_COLOR);
@@ -226,6 +215,7 @@ void drawMine(int i, int j){
 	write_pixel(i + 3, j + 5, MINE_COLOR);
 }
 
+/* renders a graphical representation of the number "1" */
 void drawNum1(int i, int j){
 	write_pixel(i + 2, j + 1, NUM_1_COLOR);
 	write_pixel(i + 3, j + 1, NUM_1_COLOR);
@@ -237,6 +227,7 @@ void drawNum1(int i, int j){
 	write_pixel(i + 4, j + 5, NUM_1_COLOR);
 }
 
+/* renders a graphical representation of the number "2" */
 void drawNum2(int i, int j){
 	write_pixel(i + 2, j + 1, NUM_2_COLOR);
 	write_pixel(i + 3, j + 1, NUM_2_COLOR);
@@ -251,6 +242,7 @@ void drawNum2(int i, int j){
 	write_pixel(i + 4, j + 5, NUM_2_COLOR);
 }
 
+/* renders a graphical representation of the number "3" */
 void drawNum3(int i, int j){
 	write_pixel(i + 2, j + 1, NUM_3_COLOR);
 	write_pixel(i + 3, j + 1, NUM_3_COLOR);
@@ -265,6 +257,7 @@ void drawNum3(int i, int j){
 	write_pixel(i + 4, j + 5, NUM_3_COLOR);
 }
 
+/* renders a graphical representation of the number "4" */
 void drawNum4(int i, int j){
 	write_pixel(i + 2, j + 1, NUM_4_COLOR);
 	write_pixel(i + 4, j + 1, NUM_4_COLOR);
@@ -277,6 +270,7 @@ void drawNum4(int i, int j){
 	write_pixel(i + 4, j + 5, NUM_4_COLOR);
 }
 
+/* renders a graphical representation of the number "5" */
 void drawNum5(int i, int j){
 	write_pixel(i + 2, j + 1, NUM_5_COLOR);
 	write_pixel(i + 3, j + 1, NUM_5_COLOR);
@@ -291,6 +285,7 @@ void drawNum5(int i, int j){
 	write_pixel(i + 4, j + 5, NUM_5_COLOR);
 }
 
+/* renders a graphical representation of the number "6" */
 void drawNum6(int i, int j){
 	write_pixel(i + 2, j + 1, NUM_6_COLOR);
 	write_pixel(i + 3, j + 1, NUM_6_COLOR);
@@ -306,6 +301,7 @@ void drawNum6(int i, int j){
 	write_pixel(i + 4, j + 5, NUM_6_COLOR);
 }
 
+/* renders a graphical representation of the number "7" */
 void drawNum7(int i, int j){
 	write_pixel(i + 2, j + 1, NUM_7_COLOR);
 	write_pixel(i + 3, j + 1, NUM_7_COLOR);
@@ -316,6 +312,7 @@ void drawNum7(int i, int j){
 	write_pixel(i + 3, j + 5, NUM_7_COLOR);
 }
 
+/* renders a graphical representation of the number "8" */
 void drawNum8(int i, int j){
 	write_pixel(i + 2, j + 1, NUM_8_COLOR);
 	write_pixel(i + 3, j + 1, NUM_8_COLOR);
@@ -332,6 +329,7 @@ void drawNum8(int i, int j){
 	write_pixel(i + 4, j + 5, NUM_8_COLOR);
 }
 
+/* renders a graphical representation of a flag */
 void drawFlag(int i, int j){
 	write_pixel(i + 1, j + 1, FLAG_COLOR);
 	write_pixel(i + 2, j + 1, FLAG_COLOR);
@@ -349,11 +347,13 @@ void drawFlag(int i, int j){
 	write_pixel(i + 4, j + 5, FLAGSTICK_COLOR);
 }
 
+/* returns 1 if the specified cell is the current highlighted cell, else 0 */
 int isSelected(int i, int j){
-	if(j == selectedX && i == selectedY) return 1;
+	if(j == selectionX && i == selectionY) return 1;
 	else return 0;
 }
 
+/* renders the specified cell based on its type */
 void drawCell(int i, int j){
 	int col = (j * CELL_SIZE) + offsetX;
 	int row = (i * CELL_SIZE) + offsetY;
@@ -380,6 +380,7 @@ void drawCell(int i, int j){
 		drawFlag(col, row);
 }
 
+/* renders the entire game board */
 void drawBoard(){
 	int i, j;
 	for(i = 0; i < boardLength; i++)
@@ -387,94 +388,65 @@ void drawBoard(){
 			drawCell(i, j);
 }
 
+/* renders the top-left corner minesweeper logo */
 void drawStatusLogo(){
 	write_text(STATUS_LOGO, 10, 10, TEXT_COLOR, 0);
 }
 
+/* renders the top-right corner no-of-mines-left label */
 void drawStatusMines(){
 	write_text(STATUS_MINES_LEFT, 187, 10, TEXT_COLOR, 0);
 }
 
+/* renders the number of mines left on the top-right corner */
 void drawStatusMinesNum(){
 	char status[3];
 	sprintf(status, "%d", minesLeft);
 	write_text(status, 295, 10, TEXT_COLOR, 0);
 }
 
+/* renders the top-right minesweeper logo & top-left no-of-mines-left status */
 void drawStatusBar(){
 	drawStatusLogo();
 	drawStatusMines();
 	drawStatusMinesNum();
 }
 
+/* renders the status bar & the game board */
 void drawGame(){
 	drawStatusBar();
 	drawBoard();
 }
 
+/* renders the updated number of mines left on the top-right corner */
 void updateStatusMinesNum(){
 	drawBox(295, 10, 18, 7, BACKGROUND_COLOR);
 	drawStatusMinesNum();
 }
 
-void printBoardSizes(){
-	write_text(START_GAME_HEADER, 84, 30, TEXT_COLOR, 1);
-	write_text(EASY_GAME_TEXT, 40, 80, TEXT_COLOR, 0);
-	write_text(MEDIUM_GAME_TEXT, 40, 110, TEXT_COLOR), 0;
-	write_text(HARD_GAME_TEXT, 40, 140, TEXT_COLOR, 0);
-}
-
-void hideBoardSizes(){
-	write_text(START_GAME_HEADER, 84, 30, BACKGROUND_COLOR, 1);
-	write_text(EASY_GAME_TEXT, 40, 80, BACKGROUND_COLOR, 0);
-	write_text(MEDIUM_GAME_TEXT, 40, 110, BACKGROUND_COLOR), 0;
-	write_text(HARD_GAME_TEXT, 40, 140, BACKGROUND_COLOR, 0);
-}
-
-void getBoardSize(){
-	char keypress;
-	hideMainMenu();
-	printBoardSizes();
-	do{
-		keypress = (char) getch();
-		if(keypress == SMALL_KEY){
-			boardLength = SMALL;
-			minesLeft = SMALL_MINES;
-		} else if(keypress == MEDIUM_KEY){
-			boardLength = MEDIUM;
-			minesLeft = MEDIUM_MINES;
-		} else if(keypress == LARGE_KEY){
-			boardLength = LARGE;
-			minesLeft = LARGE_MINES;
-			textBoardOffset = TEXT_SIZE + TEXT_LARGE_BOARD_OFFSET;
-		}
-	}while(!boardLength);
-	initialMines = minesLeft;
-	hiddenCount = (boardLength * boardLength) - initialMines;
-	offsetX = (320 - (boardLength * 7)) / 2;
-	offsetY = (200 + textBoardOffset - (boardLength * 7)) / 2;
-	hideBoardSizes();
-}
-
+/* re-renders the game board & status bar */
 void updateGame(){
 	updateStatusMinesNum();
 	drawBoard();
 }
 
-void updateSelection(int x, int y, int newX, int newY){
+/* re-renders the two specified cells */
+void updateTwoCells(int x, int y, int newX, int newY){
 	drawCell(y, x);
 	drawCell(newY, newX);
 }
 
+/* moves the highlighted cell based on the specified direction */
 void moveSelection(int direction){
-	int x = selectedX, y = selectedY;
-	if(direction == UP_KEY && selectedY - 1 >= 0) selectedY--;
-	else if(direction == LEFT_KEY && selectedX - 1 >= 0) selectedX--;
-	else if(direction == DOWN_KEY && selectedY + 1 < boardLength) selectedY++;
-	else if(direction == RIGHT_KEY && selectedX + 1 < boardLength) selectedX++;
-	updateSelection(x, y, selectedX, selectedY);
+	int x = selectionX, y = selectionY;
+	if(direction == UP_KEY && selectionY - 1 >= 0) selectionY--;
+	else if(direction == LEFT_KEY && selectionX - 1 >= 0) selectionX--;
+	else if(direction == DOWN_KEY && selectionY + 1 < boardLength) selectionY++;
+	else if(direction == RIGHT_KEY && selectionX + 1 < boardLength) selectionX++;
+	updateTwoCells(x, y, selectionX, selectionY);
 }
 
+/* returns 1 if the specified cell is a number of adjacent cells, else 0 */
 int isNum(int x, int y){
 	if(x < 0 || y < 0 || x >= boardLength || y >= boardLength) return 0;
 	if(board[y][x] == EMPTY || board[y][x] == NUM_1 || board[y][x] == NUM_2 ||
@@ -485,6 +457,7 @@ int isNum(int x, int y){
 		return 0;
 }
 
+/* returns 1 if the specified cell is hidden, else 0 */
 int isHidden(int x, int y){
 	if(x < 0 || y < 0 || x >= boardLength || y >= boardLength) return 0;
 	if(hiddenBoard[y][x] == HIDDEN || hiddenBoard[y][x] == HIDDEN_FLAGGED)
@@ -493,6 +466,7 @@ int isHidden(int x, int y){
 		return 0;
 }
 
+/* recursively reveals the specified cell's content and its adjacent empty cells until a numbered cell or board edge is encountered */
 int revealCells(int x, int y){
 	if(x < 0 || y < 0 || x >= boardLength || y >= boardLength) return 0;
 	hiddenCount--;
@@ -511,6 +485,7 @@ int revealCells(int x, int y){
 	return 0;
 }
 
+/* returns the number of mines based on the specified cell's content */
 int getNumberOfMines(int num){
 	if(num == EMPTY) return 0;
 	else if(num == NUM_1) return 1;
@@ -524,6 +499,7 @@ int getNumberOfMines(int num){
 	return 0;
 }
 
+/* returns the number of flags adjacent to the specified cell */
 int getNumberOfFlags(int x, int y){
 	int flagCtr = 0;
 	if(y - 1 >= 0 && x - 1 >= 0 && hiddenBoard[y - 1][x - 1] == HIDDEN_FLAGGED) flagCtr++;
@@ -537,10 +513,11 @@ int getNumberOfFlags(int x, int y){
 	return flagCtr;
 }
 
+/* recursively reveals the highlighted number's adjacent empty cells until a numbered cell or board edge is encountered */
 void selectAllAdjacent(){
-	int x = selectedX, y = selectedY;
-	int numOfMines = getNumberOfMines(board[selectedY][selectedX]);
-	int numOfFlags = getNumberOfFlags(selectedX, selectedY);
+	int x = selectionX, y = selectionY;
+	int numOfMines = getNumberOfMines(board[selectionY][selectionX]);
+	int numOfFlags = getNumberOfFlags(selectionX, selectionY);
 	if(numOfMines == numOfFlags){
 		if(isNum(x - 1, y) && isHidden(x - 1, y)) revealCells(x - 1, y);
 		if(isNum(x, y - 1) && isHidden(x, y - 1)) revealCells(x, y - 1);
@@ -553,44 +530,48 @@ void selectAllAdjacent(){
 	}
 }
 
+/* recursively reveals the highlighted cell's content and its adjacent empty cells until a numbered cell or board edge is encountered */
 int select(int* selectNum){
 	if(!((*selectNum)++)) randomizeBoard();
-	if(hiddenBoard[selectedY][selectedX] == HIDDEN){
-		if(board[selectedY][selectedX] == MINE){
-			hiddenBoard[selectedY][selectedX] = REVEALED;
-			drawCell(selectedY, selectedX);
+	if(hiddenBoard[selectionY][selectionX] == HIDDEN){
+		if(board[selectionY][selectionX] == MINE){
+			hiddenBoard[selectionY][selectionX] = REVEALED;
+			drawCell(selectionY, selectionX);
 			return LOSE;
 		} else {
-			revealCells(selectedX, selectedY);
+			revealCells(selectionX, selectionY);
 		}
-	} else if(isNum(selectedX, selectedY)){
+	} else if(isNum(selectionX, selectionY)){
 		selectAllAdjacent();
 	}
 	if(!hiddenCount) return WIN;
 	return NONE;
 }
 
+/* updates & re-renders the number of mines left based on the nubmer of flags */
 void updateMinesLeft(){
 	minesLeft = initialMines - flagCount;
 	if(minesLeft < 0) minesLeft = 0;
 	updateStatusMinesNum();
 }
 
+/* marks the highlighted cell as flagged & updates the number of flags */
 void flag(){
-	if(hiddenBoard[selectedY][selectedX] == HIDDEN){
-		hiddenBoard[selectedY][selectedX] = HIDDEN_FLAGGED;
+	if(hiddenBoard[selectionY][selectionX] == HIDDEN){
+		hiddenBoard[selectionY][selectionX] = HIDDEN_FLAGGED;
 		flagCount++;
-	} else if(hiddenBoard[selectedY][selectedX] == HIDDEN_FLAGGED){
-		hiddenBoard[selectedY][selectedX] = HIDDEN;
+	} else if(hiddenBoard[selectionY][selectionX] == HIDDEN_FLAGGED){
+		hiddenBoard[selectionY][selectionX] = HIDDEN;
 		flagCount--;
 	}
 	updateMinesLeft();
-	drawCell(selectedY, selectedX);
+	drawCell(selectionY, selectionX);
 }
 
+/* preserves board length & resets other game variables to their initial value */
 void restart(){
-	selectedX = 0;
-	selectedY = 0;
+	selectionX = 0;
+	selectionY = 0;
 	flagCount = 0;
 	hiddenCount = (boardLength * boardLength) - initialMines;
 	minesLeft = initialMines;
@@ -599,18 +580,7 @@ void restart(){
 	startMinesweeper();
 }
 
-void printWinText(){
-	write_text(WIN_TEXT, 124, 80, TEXT_COLOR, 1);
-	write_text(PRESS_ANY_KEY, 43, 160, TEXT_COLOR, 0);
-}
-
-void announceWin(){
-	drawBackground();
-	printWinText();
-	char keypress = (char) getch();
-	if(keypress == RESET_KEY) restart();
-}
-
+/* starts the ready-to-play minesweeper game & listens for keypresses */
 void startMinesweeper(){
 	char keypress;
 	int selectNum = 0, endGame = 0;
@@ -628,16 +598,17 @@ void startMinesweeper(){
 	else if(((keypress == QUIT_KEY && selectNum) || endGame) && revealAllMines() == RESET_KEY) restart();
 	if(endGame == WIN){
 		minesLeft = 0;
-		announceWin();
+		openWinAnnouncementMenu();
 		updateStatusMinesNum();
 	}
 }
 
+/* resets all game variables to ther initial values */
 void resetVariables(){
 	freeBoard();
 	boardLength = 0;
-	selectedX = 0;
-	selectedY = 0;
+	selectionX = 0;
+	selectionY = 0;
 	hiddenCount = 0;
 	minesLeft = 0;
 	initialMines = 0;
@@ -647,18 +618,7 @@ void resetVariables(){
 	textBoardOffset = 0;
 }
 
-void randomizeMines(){
-	int x, y;
-	int mines = minesLeft;
-	while(mines > 0){
-		x = rand() % boardLength;
-		y = rand() % boardLength;
-		if(board[y][x] || (x == selectedX && y == selectedY)) continue;
-		board[y][x] = MINE;
-		mines--;
-	}
-}
-
+/* reveals all mines by updating cell content & re-rendering the cell */
 char revealAllMines(){
 	int i, j;
 	for(i = 0; i < boardLength; i++)
@@ -670,6 +630,20 @@ char revealAllMines(){
 	return (char) getch();
 }
 
+/* randomly places mines on game board with the highlighted cell as exception */
+void randomizeMines(){
+	int x, y;
+	int mines = minesLeft;
+	while(mines > 0){
+		x = rand() % boardLength;
+		y = rand() % boardLength;
+		if(board[y][x] || (x == selectionX && y == selectionY)) continue;
+		board[y][x] = MINE;
+		mines--;
+	}
+}
+
+/* returns the number of mines adjacent to the specified cell */
 int countAdjacentMines(int i, int j){
 	int mineCtr = 0;
 	if(i - 1 >= 0 && j - 1 >= 0 && board[i - 1][j - 1] == MINE) mineCtr++;
@@ -683,6 +657,7 @@ int countAdjacentMines(int i, int j){
 	return mineCtr;
 }
 
+/* updates cell content based on the number of adjacent mines */
 void updateNumbers(){
 	int i, j;
 	for(i = 0; i < boardLength; i++)
@@ -691,18 +666,36 @@ void updateNumbers(){
 				board[i][j] = countAdjacentMines(i, j);
 }
 
+/* randomly places mines & updates cells' content based on the number of adjacent mines */
 void randomizeBoard(){
 	randomizeMines();
 	updateNumbers();
 }
 
+/* prompts for game difficulty, allocates memory, starts the game, then resets the variables on endgame */ 
 void startGame(){
-	getBoardSize();
+	openChooseDifficultyMenu();
 	initializeBoard();
 	startMinesweeper();
 	resetVariables();
 }
 
+/* allocates space for the board arrays */
+void initializeBoard(){
+	int i, j;
+	board = (int**) malloc(sizeof(int*) * boardLength);
+	hiddenBoard = (int**) malloc(sizeof(int*) * boardLength);
+	for(i = 0; i < boardLength; i++){
+		board[i] = (int*) malloc(sizeof(int) * boardLength);
+		hiddenBoard[i] = (int*) malloc(sizeof(int) * boardLength);
+		for(j = 0; j < boardLength; j++){
+			board[i][j] = EMPTY;
+			hiddenBoard[i][j] = HIDDEN;
+		}
+	}
+}
+
+/* frees space occupied by board arrays */
 void freeBoard(){
 	int i;
 	for(i = 0; i < boardLength; i++){
@@ -713,23 +706,64 @@ void freeBoard(){
 	free(hiddenBoard);
 }
 
-void printMainMenu(){
-	write_text(LOGO_MENU_TEXT, 111, 30, TEXT_COLOR, 1);
-	write_text(START_MENU_TEXT, 95, 70, TEXT_COLOR, 0);
-	write_text(CONTROLS_MENU_TEXT, 95, 95, TEXT_COLOR), 0;
-	write_text(ABOUT_MENU_TEXT, 95, 120, TEXT_COLOR, 0);
-	write_text(EXIT_MENU_TEXT, 95, 145, TEXT_COLOR, 0);
+/* renders the you-win menu text */
+void printWinAnnouncementText(){
+	write_text(WIN_TEXT, 124, 80, TEXT_COLOR, 1);
+	write_text(PRESS_ANY_KEY, 43, 160, TEXT_COLOR, 0);
 }
 
-void hideMainMenu(){
-	write_text(LOGO_MENU_TEXT, 111, 30, BACKGROUND_COLOR, 1);
-	write_text(START_MENU_TEXT, 95, 70, BACKGROUND_COLOR, 0);
-	write_text(CONTROLS_MENU_TEXT, 95, 95, BACKGROUND_COLOR), 0;
-	write_text(ABOUT_MENU_TEXT, 95, 120, BACKGROUND_COLOR, 0);
-	write_text(EXIT_MENU_TEXT, 95, 145, BACKGROUND_COLOR, 0);
+/* opens the you-win menu & waits for keypress */
+void openWinAnnouncementMenu(){
+	drawBackground();
+	printWinAnnouncementText();
+	char keypress = (char) getch();
+	if(keypress == RESET_KEY) restart();
 }
 
-void printControlsMenu(){
+/* renders the choose-difficulty screen text */
+void printChooseDifficultyMenuText(){
+	write_text(START_GAME_HEADER, 84, 30, TEXT_COLOR, 1);
+	write_text(EASY_GAME_TEXT, 40, 80, TEXT_COLOR, 0);
+	write_text(MEDIUM_GAME_TEXT, 40, 110, TEXT_COLOR), 0;
+	write_text(HARD_GAME_TEXT, 40, 140, TEXT_COLOR, 0);
+}
+
+/* hides the choose-difficulty screen text by re-rendering using background color */
+void hideChooseDifficultyMenu(){
+	write_text(START_GAME_HEADER, 84, 30, BACKGROUND_COLOR, 1);
+	write_text(EASY_GAME_TEXT, 40, 80, BACKGROUND_COLOR, 0);
+	write_text(MEDIUM_GAME_TEXT, 40, 110, BACKGROUND_COLOR), 0;
+	write_text(HARD_GAME_TEXT, 40, 140, BACKGROUND_COLOR, 0);
+}
+
+/* opens the choose-difficulty menu, waits for a choice, then hides the menu */
+void openChooseDifficultyMenu(){
+	char keypress;
+	hideMainMenuText();
+	printChooseDifficultyMenuText();
+	do{
+		keypress = (char) getch();
+		if(keypress == SMALL_KEY){
+			boardLength = SMALL;
+			minesLeft = SMALL_MINES;
+		} else if(keypress == MEDIUM_KEY){
+			boardLength = MEDIUM;
+			minesLeft = MEDIUM_MINES;
+		} else if(keypress == LARGE_KEY){
+			boardLength = LARGE;
+			minesLeft = LARGE_MINES;
+			textBoardOffset = TEXT_SIZE + TEXT_LARGE_BOARD_OFFSET;
+		}
+	}while(!boardLength);
+	initialMines = minesLeft;
+	hiddenCount = (boardLength * boardLength) - initialMines;
+	offsetX = (320 - (boardLength * 7)) / 2;
+	offsetY = (200 + textBoardOffset - (boardLength * 7)) / 2;
+	hideChooseDifficultyMenu();
+}
+
+/* renders the controls menu text */
+void printControlsMenuText(){
 	write_text(CONTROLS_HEADER, 102, 30, TEXT_COLOR, 1);
 	write_text(CONTROLS_MOVE_UP, 90, 70, TEXT_COLOR, 0);
 	write_text(CONTROLS_MOVE_LEFT, 90, 80, TEXT_COLOR), 0;
@@ -742,7 +776,8 @@ void printControlsMenu(){
 	write_text(PRESS_ANY_KEY, 43, 160, TEXT_COLOR, 0);
 }
 
-void hideControlsMenu(){
+/* hides the controls menu text by re-rendering using background color */
+void hideControlsMenuText(){
 	write_text(CONTROLS_HEADER, 102, 30, BACKGROUND_COLOR, 1);
 	write_text(CONTROLS_MOVE_UP, 90, 70, BACKGROUND_COLOR, 0);
 	write_text(CONTROLS_MOVE_LEFT, 90, 80, BACKGROUND_COLOR), 0;
@@ -755,13 +790,15 @@ void hideControlsMenu(){
 	write_text(PRESS_ANY_KEY, 43, 160, BACKGROUND_COLOR, 0);
 }
 
+/* opens the controls menu & waits for keypress */
 void openControlsMenu(){
 	char keypress;
-	printControlsMenu();
+	printControlsMenuText();
 	keypress = (char) getch();
 }
 
-void printAboutMenu(){
+/* renders the about menu text */
+void printAboutMenuText(){
 	write_text(ABOUT_HEADER, 138, 30, TEXT_COLOR, 1);
 	write_text(ABOUT_PROJECT_INFO_1, 102, 62, TEXT_COLOR), 0;
 	write_text(ABOUT_PROJECT_INFO_2, 111, 72, TEXT_COLOR, 0);
@@ -772,7 +809,8 @@ void printAboutMenu(){
 	write_text(PRESS_ANY_KEY, 43, 160, TEXT_COLOR, 0);
 }
 
-void hideAboutMenu(){
+/* hides the about menu text by re-rendering using background color */
+void hideAboutMenuText(){
 	write_text(ABOUT_HEADER, 138, 30, BACKGROUND_COLOR, 1);
 	write_text(ABOUT_PROJECT_INFO_1, 102, 62, BACKGROUND_COLOR), 0;
 	write_text(ABOUT_PROJECT_INFO_2, 111, 72, BACKGROUND_COLOR, 0);
@@ -783,35 +821,56 @@ void hideAboutMenu(){
 	write_text(PRESS_ANY_KEY, 43, 160, BACKGROUND_COLOR, 0);
 }
 
+/* opens the about menu & waits for keypress */
 void openAboutMenu(){
 	char keypress;
-	printAboutMenu();
+	printAboutMenuText();
 	keypress = (char) getch();
 }
 
+/* renders the main menu text */
+void printMainMenuText(){
+	write_text(LOGO_MENU_TEXT, 111, 30, TEXT_COLOR, 1);
+	write_text(START_MENU_TEXT, 95, 70, TEXT_COLOR, 0);
+	write_text(CONTROLS_MENU_TEXT, 95, 95, TEXT_COLOR), 0;
+	write_text(ABOUT_MENU_TEXT, 95, 120, TEXT_COLOR, 0);
+	write_text(EXIT_MENU_TEXT, 95, 145, TEXT_COLOR, 0);
+}
+
+/* hides the main menu text by re-rendering using background color */
+void hideMainMenuText(){
+	write_text(LOGO_MENU_TEXT, 111, 30, BACKGROUND_COLOR, 1);
+	write_text(START_MENU_TEXT, 95, 70, BACKGROUND_COLOR, 0);
+	write_text(CONTROLS_MENU_TEXT, 95, 95, BACKGROUND_COLOR), 0;
+	write_text(ABOUT_MENU_TEXT, 95, 120, BACKGROUND_COLOR, 0);
+	write_text(EXIT_MENU_TEXT, 95, 145, BACKGROUND_COLOR, 0);
+}
+
+/* opens the main menu, waits for a choice, then hides the menu */
 void openMainMenu(){
 	char keypress;
 	drawBackground();
-	printMainMenu();
+	printMainMenuText();
 	do{
 		keypress = (char) getch();
 		if(keypress == START_MENU_KEY){
 			startGame();
 			drawBackground();
 		} else if(keypress == CONTROLS_MENU_KEY){
-			hideMainMenu();
+			hideMainMenuText();
 			openControlsMenu();
-			hideControlsMenu();
+			hideControlsMenuText();
 		} else if(keypress == ABOUT_MENU_KEY){
-			hideMainMenu();
+			hideMainMenuText();
 			openAboutMenu(); 
-			hideAboutMenu();
+			hideAboutMenuText();
 		}
 		if(keypress == START_MENU_KEY || keypress == CONTROLS_MENU_KEY || keypress == ABOUT_MENU_KEY)
-			printMainMenu();
+			printMainMenuText();
 	}while(keypress != EXIT_MENU_KEY);
 }
 
+/* sets up vga graphics, runs the game, then reverts to the terminal */
 int main(){
 	srand(time(NULL));
 	set_graphics(VGA_320X200X256);
